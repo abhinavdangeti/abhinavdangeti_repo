@@ -62,7 +62,6 @@ public class ViewQuery {
 	private static boolean loadQuery(String bucketname, String bucketpasswd, String ddocname,
 			String viewname, String serverAddr, String port) throws InterruptedException, ExecutionException {
 	
-		System.out.println(port);
 		String SERVER_URI = "http://" + serverAddr + ":" + port + "/pools";
 		List<URI> uris = new LinkedList<URI>();
 		uris.add(URI.create(SERVER_URI));
