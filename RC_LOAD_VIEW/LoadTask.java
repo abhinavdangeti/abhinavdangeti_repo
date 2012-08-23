@@ -15,25 +15,34 @@ import com.couchbase.client.CouchbaseClient;
 import net.spy.memcached.internal.OperationFuture;
 
 public class LoadTask {
+			
+	private static int NUM_ITEMS = 0;
+	private static int EXPIRES = 0;
+	private static String BUCKET_NAME = "default";
+	private static String BUCKET_PASSWD = "";
+	private static String port = "8091";
+	private static String serverAddr = "127.0.0.1";
+	private static String do_delete_flag = "No";
 
-	private static CouchbaseClient client;
 	
-	private static void connect(String serverAddr, String port, String BUCKET_NAME, String BUCKET_PASSWD) throws URISyntaxException, IOException{
-		
+	 static final CouchbaseClient connect() throws URISyntaxException, IOException{
 		List<URI> uris = new LinkedList<URI>();
 		uris.add(URI.create(String.format("http://" + serverAddr + ":" + port + "/pools")));
 	    
 	    try {
-	      client = new CouchbaseClient(uris, BUCKET_NAME, BUCKET_PASSWD);
+	      return new CouchbaseClient(uris, BUCKET_NAME, BUCKET_PASSWD);
 	    } catch (Exception e) {
 	      System.err.println("Error connecting to Couchbase: "
 	        + e.getMessage());
 	      System.exit(0);
 	    }
+	    return null;
+	    
 	}
 	
-	private static void load_items(int count, int EXPIRES) throws InterruptedException, ExecutionException{
-		for(int i=1;i<=count;i++){
+	private static void load_items() throws InterruptedException, ExecutionException, URISyntaxException, IOException{
+		CouchbaseClient client = connect();
+		for(int i=1;i<=NUM_ITEMS;i++){
 			String Key = String.format("Key-%d", i);
 			String Value = String.format("%d", i);
 			OperationFuture<Boolean> setOp = client.set(Key, EXPIRES, Value);
@@ -41,12 +50,14 @@ public class LoadTask {
 				System.err.println("Set failed: " + 
 							setOp.getStatus().getMessage());
 			    break;
-			}
-		}		
+			} else {
+				System.out.println("Set Key: " + i);
+			}		
+		}
 	}
 	
-	private static void delete_items(int count){
-		for(int i=1;i<=count;i++){
+	private static void delete_items(CouchbaseClient client){
+		for(int i=1;i<=NUM_ITEMS;i++){
 			try {
 		        OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i));;
 				if (delOp.get().booleanValue() == false) {
@@ -63,8 +74,7 @@ public class LoadTask {
 	@SuppressWarnings("rawtypes")
 	public static void main(String args[]) throws URISyntaxException, InterruptedException, ExecutionException{
 		
-		int NUM_ITEMS = 0, EXPIRES = 0;
-		String BUCKET_NAME = "default", BUCKET_PASSWD = "", port = "8091", serverAddr = "127.0.0.1", do_delete_flag = "No";
+		CouchbaseClient client = null;
 		
 		try {
 			File file = new File("test.properties");
@@ -98,34 +108,79 @@ public class LoadTask {
 		}
 
 		try{
-			connect(serverAddr, port, BUCKET_NAME, BUCKET_PASSWD);
+			client = connect();
 		}catch (IOException ex){
 			ex.printStackTrace();
 		}
 		
-		System.out.println("Load a " + NUM_ITEMS + " items ..");
-		load_items(NUM_ITEMS, EXPIRES);
+		final int ITEM_COUNT = NUM_ITEMS;
 		
-		int count = 0;
-		for(int i=1;i<=NUM_ITEMS;i++){
-			Object getObject = client.get(String.format("Key-%d", i));
-			if (getObject != null) {
-				//System.out.println("Retrieved: "+ (String) getObject);
-			    count++;
-			} else {
-				System.err.println("Synchronous Get failed");
-				break;
+		Runnable myRunnable1 = new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Load a " + ITEM_COUNT + " items ..");
+				try {
+					load_items();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}			
+		};
+
+		Runnable myRunnable2 = new Runnable() {		
+			public void run() {
+				CouchbaseClient client1 = null;
+				try{
+					client1 = connect();
+					} catch(Exception e){
+					}				
+				while(true){
+					int count = 0;
+					for(int i=1;i<=ITEM_COUNT;i++){
+						Object getObject = null;
+						try{
+							getObject = client1.get(String.format("Key-%d", i));
+						}catch (Exception e){
+							break;
+						}
+						if (getObject != null) {
+							System.out.println("Retrieved: "+ (String) getObject);
+						    count++;
+						} else {
+							System.err.println("Synchronous Get failed");
+							break;
+						}
+					}
+					if(count==ITEM_COUNT){
+						System.out.println("Synchronous Get for all " + count + " items : Suceeded! ");
+						client1.shutdown(10, TimeUnit.SECONDS);
+						break;
+					}
+				}
 			}
-		}
+		};
 		
-		if(count==NUM_ITEMS)
-			System.out.println("Synchronous Get for all " + count + " items : Suceeded! ");
+		System.out.println("Running thread1: ");
+		Thread thread1 = new Thread(myRunnable1);
+		thread1.start();	
+		System.out.println("Running thread2: ");
+		Thread thread2 = new Thread(myRunnable2);
+		thread2.start();
+		thread1.join();
+		thread2.join();
 		
 		if (do_delete_flag.equals("Yes") || do_delete_flag.equals("1")) {
 			System.out.println("Now deleting the " + NUM_ITEMS + " items ..");
-			delete_items(NUM_ITEMS);
+			delete_items(client);
 		}
 		
 		client.shutdown(10, TimeUnit.SECONDS);
+		System.exit(0);
 	}
 }
