@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.File;
+import net.spy.memcached.PersistTo;
+import net.spy.memcached.ReplicateTo;
 
 import com.couchbase.client.CouchbaseClient;
 import net.spy.memcached.internal.OperationFuture;
