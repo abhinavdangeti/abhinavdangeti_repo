@@ -23,7 +23,7 @@ public class LoadTask {
 	private static String port = "8091";
 	private static String serverAddr = "127.0.0.1";
 	private static String do_delete_flag = "No";
-
+	private static double DEL_PERCENT = 0.3;
 	
 	 static final CouchbaseClient connect() throws URISyntaxException, IOException{
 		List<URI> uris = new LinkedList<URI>();
@@ -57,7 +57,8 @@ public class LoadTask {
 	}
 	
 	private static void delete_items(CouchbaseClient client){
-		for(int i=1;i<=NUM_ITEMS;i++){
+		double del_items = DEL_PERCENT * NUM_ITEMS;
+		for(int i=1;i<=(int)(del_items);i++){
 			try {
 		        OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i));;
 				if (delOp.get().booleanValue() == false) {
@@ -172,8 +173,6 @@ public class LoadTask {
 		System.out.println("Running thread2: ");
 		Thread thread2 = new Thread(myRunnable2);
 		thread2.start();
-		thread1.join();
-		thread2.join();
 		
 		if (do_delete_flag.equals("Yes") || do_delete_flag.equals("1")) {
 			System.out.println("Now deleting the " + NUM_ITEMS + " items ..");

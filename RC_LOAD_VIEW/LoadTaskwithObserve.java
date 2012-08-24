@@ -25,7 +25,7 @@ public class LoadTaskWithObserve {
 	private static String port = "8091";
 	private static String serverAddr = "127.0.0.1";
 	private static String do_delete_flag = "No";
-
+	private static double DEL_PERCENT = 0.3;
 	
 	 static final CouchbaseClient connect() throws URISyntaxException, IOException{
 		List<URI> uris = new LinkedList<URI>();
@@ -62,7 +62,8 @@ public class LoadTaskWithObserve {
 	}
 	
 	private static void delete_items(CouchbaseClient client){
-		for(int i=1;i<=NUM_ITEMS;i++){
+		double del_items = DEL_PERCENT * NUM_ITEMS;
+		for(int i=1;i<=(int)(del_items);i++){
 			try {
 		        OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i));;
 				if (delOp.get().booleanValue() == false) {
