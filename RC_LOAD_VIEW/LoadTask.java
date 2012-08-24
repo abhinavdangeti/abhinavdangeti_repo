@@ -173,6 +173,8 @@ public class LoadTask {
 		System.out.println("Running thread2: ");
 		Thread thread2 = new Thread(myRunnable2);
 		thread2.start();
+		thread1.join();
+		thread2.join();
 		
 		if (do_delete_flag.equals("Yes") || do_delete_flag.equals("1")) {
 			System.out.println("Now deleting the " + NUM_ITEMS + " items ..");
