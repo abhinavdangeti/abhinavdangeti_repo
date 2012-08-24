@@ -4,7 +4,18 @@ Instructions:
 Manually set up a cluster, create a bucket.
 Create a view
 
-- Set the server name, bucket name/password, viewname etc. in test.properties.
+- test.properties
+	item-count
+	bucket-name
+	bucket-password
+	expiration
+	ratio-expires
+	servers
+	port
+	do-delete (flag)
+	ratio-deletes
+	ddoc-name
+	view-name
 
 - LOADTASK:
 	- Compiling:
