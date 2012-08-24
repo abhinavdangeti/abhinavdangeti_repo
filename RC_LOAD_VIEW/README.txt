@@ -1,8 +1,8 @@
 README:
 Instructions:
 
-Manually set up a cluster, create a bucket.
-Create a view
+- Manually set up a cluster, create a bucket.
+- Query a view
 
 - test.properties
 	item-count
