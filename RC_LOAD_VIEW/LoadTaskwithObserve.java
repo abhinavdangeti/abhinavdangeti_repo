@@ -155,7 +155,7 @@ public class LoadTaskWithObserve {
 					BUCKET_NAME = properties.getProperty(key);
 				else if(key.equals("bucket-password"))
 					BUCKET_PASSWD = properties.getProperty(key);
-				else if(key.equals("EXPIRATION"))
+				else if(key.equals("expiration"))
 					EXPIRATION = Integer.parseInt(properties.getProperty(key));
 				else if(key.equals("ratio-expires"))
 					RATIO_EXP = Float.parseFloat(properties.getProperty(key));
