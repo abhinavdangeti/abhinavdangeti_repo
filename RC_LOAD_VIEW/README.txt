@@ -19,57 +19,13 @@ Create a view
 
 - LOADTASK:
 	- Compiling:
-		javac -cp :couchbase-client-1.1.0c-RC-javadocs.jar:
-				couchbase-client-1.1.0c-RC-sources.jar:
-				couchbase-client-1.1.0c-RC.jar:
-				spymemcached-2.8.3-SNAPSHOT-javadocs.jar:
-				spymemcached-2.8.3-SNAPSHOT-sources.jar:
-				spymemcached-2.8.3-SNAPSHOT.jar:
-				httpcore-4.2.1.jar:
-				httpcore-nio-4.1.1.jar:
-				netty-3.2.0.Final.jar:
-				jettison-1.1.jar 
-				LoadTask.java
+		javac -cp :couchbase-client-1.1.0c-RC.jar:couchbase-client-1.1.0c-RC-javadocs.jar:couchbase-client-1.1.0c-RC-sources.jar:spymemcached-2.8.3.jar:spymemcached-2.8.3-javadocs.jar:spymemcached-2.8.3-sources.jar:commons-codec-1.5.jar:httpcore-4.2.1.jar:httpcore-nio-4.1.1.jar:httpclient-cache-4.2.1.jar:jettison-1.1.jar:netty-3.2.0.Final.jar LoadTask.java
 				
 	- Running:
-		java -cp .:couchbase-client-1.1.0c-RC-javadocs.jar:
-				couchbase-client-1.1.0c-RC-sources.jar:
-				couchbase-client-1.1.0c-RC.jar:
-				spymemcached-2.8.3-SNAPSHOT-javadocs.jar:
-				spymemcached-2.8.3-SNAPSHOT-sources.jar:
-				spymemcached-2.8.3-SNAPSHOT.jar:
-				httpcore-4.2.1.jar:
-				httpcore-nio-4.1.1.jar:
-				netty-3.2.0.Final.jar:
-				jettison-1.1.jar:
-				commons-codec-1.5.jar
-				LoadTask
+		java -cp .:couchbase-client-1.1.0c-RC.jar:couchbase-client-1.1.0c-RC-javadocs.jar:couchbase-client-1.1.0c-RC-sources.jar:spymemcached-2.8.3.jar:spymemcached-2.8.3-javadocs.jar:spymemcached-2.8.3-sources.jar:commons-codec-1.5.jar:httpcore-4.2.1.jar:httpcore-nio-4.1.1.jar:httpclient-cache-4.2.1.jar:jettison-1.1.jar:netty-3.2.0.Final.jar LoadTask
 		
 - VIEWQUERY
 	- Compiling:
-		javac -cp :couchbase-client-1.1.0c-RC-javadocs.jar:
-				couchbase-client-1.1.0c-RC-sources.jar:
-				couchbase-client-1.1.0c-RC.jar:
-				spymemcached-2.8.3-SNAPSHOT-javadocs.jar:
-				spymemcached-2.8.3-SNAPSHOT-sources.jar:
-				spymemcached-2.8.3-SNAPSHOT.jar:
-				httpcore-4.2.1.jar:
-				httpcore-nio-4.1.1.jar:
-				netty-3.2.0.Final.jar:
-				jettison-1.1.jar:
-				httpclient-cache-4.2.1.jar 
-				ViewQuery.java
+		javac -cp :couchbase-client-1.1.0c-RC.jar:couchbase-client-1.1.0c-RC-javadocs.jar:couchbase-client-1.1.0c-RC-sources.jar:spymemcached-2.8.3.jar:spymemcached-2.8.3-javadocs.jar:spymemcached-2.8.3-sources.jar:commons-codec-1.5.jar:httpcore-4.2.1.jar:httpcore-nio-4.1.1.jar:httpclient-cache-4.2.1.jar:jettison-1.1.jar:netty-3.2.0.Final.jar ViewQuery.java
 	- Running:
-		java -cp .:couchbase-client-1.1.0c-RC-javadocs.jar:
-				couchbase-client-1.1.0c-RC-sources.jar:
-				couchbase-client-1.1.0c-RC.jar:
-				spymemcached-2.8.3-SNAPSHOT-javadocs.jar:
-				spymemcached-2.8.3-SNAPSHOT-sources.jar:
-				spymemcached-2.8.3-SNAPSHOT.jar:
-				httpcore-4.2.1.jar:
-				httpcore-nio-4.1.1.jar:
-				netty-3.2.0.Final.jar:
-				jettison-1.1.jar:
-				commons-codec-1.5.jar:
-				httpclient-cache-4.2.1.jar
-				ViewQuery
+		java -cp .:couchbase-client-1.1.0c-RC.jar:couchbase-client-1.1.0c-RC-javadocs.jar:couchbase-client-1.1.0c-RC-sources.jar:spymemcached-2.8.3.jar:spymemcached-2.8.3-javadocs.jar:spymemcached-2.8.3-sources.jar:commons-codec-1.5.jar:httpcore-4.2.1.jar:httpcore-nio-4.1.1.jar:httpclient-cache-4.2.1.jar:jettison-1.1.jar:netty-3.2.0.Final.jar ViewQuery

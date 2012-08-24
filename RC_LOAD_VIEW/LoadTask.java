@@ -44,7 +44,6 @@ public class LoadTask {
 	private static void load_items() throws InterruptedException, ExecutionException, URISyntaxException, IOException{
 		CouchbaseClient client = connect();
 		int ITEMS_WITH_EXP = (int) (NUM_ITEMS * RATIO_EXP);
-		System.out.println(ITEMS_WITH_EXP);
 		for(int i=1;i<=(NUM_ITEMS - ITEMS_WITH_EXP);i++){
 			String Key = String.format("Key-%d", i);
 			String Value = String.format("%d", i);
