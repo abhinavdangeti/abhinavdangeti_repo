@@ -46,7 +46,7 @@ public class LoadTaskWithObserve {
 	private static void load_items() throws InterruptedException, ExecutionException, URISyntaxException, IOException{
 		CouchbaseClient client = connect();
 		int ITEMS_WITH_EXP = (int) (NUM_ITEMS * RATIO_EXP);
-		System.out.println(ITEMS_WITH_EXP);
+		//System.out.println(ITEMS_WITH_EXP);
 		for(int i=1;i<=(NUM_ITEMS - ITEMS_WITH_EXP);i++){
 			String Key = String.format("Key-%d", i);
 			String Value = String.format("%d", i);
@@ -127,7 +127,7 @@ public class LoadTaskWithObserve {
 							+ e.getMessage());
 				}
 			}
-			System.out.println(count + "/" + (int)(del_items));
+			//System.out.println(count + "/" + (int)(del_items));
 			if(count == (int)(del_items)){
 				System.out.println("Items deleted: " + count);
 				client.shutdown(10, TimeUnit.SECONDS);
