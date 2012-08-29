@@ -52,8 +52,8 @@ public class LoadTaskWithObserve {
 			String Value = String.format("%d", i);
 			OperationFuture<Boolean> setOp = client.set(Key, 0, Value, PersistTo.MASTER);
 			assert setOp.get().booleanValue() : "Key was not persisted by master";
-			setOp = client.set(Key, 0, Value, PersistTo.FOUR, ReplicateTo.THREE);
-			assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";
+			//setOp = client.set(Key, 0, Value, PersistTo.FOUR, ReplicateTo.THREE);
+			//assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";
 			if (setOp.get().booleanValue() == false) {
 				System.err.println("Set failed: " + 
 							setOp.getStatus().getMessage());
@@ -67,8 +67,8 @@ public class LoadTaskWithObserve {
 			String Value = String.format("%d", i);
 			OperationFuture<Boolean> setOp = client.set(Key, EXPIRATION, Value, PersistTo.MASTER);
 			assert setOp.get().booleanValue() : "Key was not persisted by master";
-			setOp = client.set(Key, EXPIRATION, Value, PersistTo.FOUR, ReplicateTo.THREE);
-			assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";
+			//setOp = client.set(Key, EXPIRATION, Value, PersistTo.FOUR, ReplicateTo.THREE);
+			//assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";
 			if (setOp.get().booleanValue() == false) {
 				System.err.println("Set failed: " + 
 							setOp.getStatus().getMessage());
@@ -114,8 +114,8 @@ public class LoadTaskWithObserve {
 		while(true){
 			for(int i=1;i<=(int)(del_items);i++){
 				try {
-					OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i), PersistTo.Master);
-					assert.setOp.get.booleanValue() : "Key was not persisted to master";
+					OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i), PersistTo.MASTER);
+					assert delOp.get().booleanValue() : "Key was not persisted to master";
 					
 					if (delOp.get().booleanValue() == false) {
 						System.err.println("Delete failed: " +
