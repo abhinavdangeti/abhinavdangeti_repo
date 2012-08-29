@@ -53,14 +53,7 @@ public class LoadTaskWithObserve {
 			OperationFuture<Boolean> setOp = client.set(Key, 0, Value, PersistTo.MASTER);
 			assert setOp.get().booleanValue() : "Key was not persisted by master";
 			//setOp = client.set(Key, 0, Value, PersistTo.FOUR, ReplicateTo.THREE);
-			//assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";
-			if (setOp.get().booleanValue() == false) {
-				System.err.println("Set failed: " + 
-							setOp.getStatus().getMessage());
-			    break;
-			} else {
-				//System.out.println("Set Key: " + i);
-			}		
+			//assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";		
 		}
 		for(int i=(NUM_ITEMS - ITEMS_WITH_EXP + 1);i<=NUM_ITEMS;i++){
 			String Key = String.format("Key-%d", i);
@@ -68,14 +61,7 @@ public class LoadTaskWithObserve {
 			OperationFuture<Boolean> setOp = client.set(Key, EXPIRATION, Value, PersistTo.MASTER);
 			assert setOp.get().booleanValue() : "Key was not persisted by master";
 			//setOp = client.set(Key, EXPIRATION, Value, PersistTo.FOUR, ReplicateTo.THREE);
-			//assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";
-			if (setOp.get().booleanValue() == false) {
-				System.err.println("Set failed: " + 
-							setOp.getStatus().getMessage());
-			    break;
-			} else {
-				//System.out.println("Set Key: " + i);
-			}		
+			//assert !setOp.get().booleanValue() : "Were there really 4 servers with 3 replicas for a testing system ?";		
 		}
 		client.shutdown(10, TimeUnit.SECONDS);
 	}
@@ -111,29 +97,19 @@ public class LoadTaskWithObserve {
 		double del_items = DEL_PERCENT * NUM_ITEMS;
 		CouchbaseClient client = connect();
 		int count = 0;
-		while(true){
-			for(int i=1;i<=(int)(del_items);i++){
-				try {
-					OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i), PersistTo.MASTER);
-					assert delOp.get().booleanValue() : "Key was not persisted to master";
-					
-					if (delOp.get().booleanValue() == false) {
-						System.err.println("Delete failed: " +
-								delOp.getStatus().getMessage());
+		for(int i=1;i<=(int)(del_items);i++){
+			try {
+				OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i), PersistTo.MASTER);
+				assert !delOp.get().booleanValue() : "Key has persisted to master";
+				if (!delOp.get().booleanValue()){
+					count ++;
+					//System.out.println(count + "/" + (int)(del_items));
+					if(count == (int)(del_items))
 						break;
-					} else {
-						count ++;
-					}
-				} catch (Exception e) {
-					System.err.println("Exception while doing delete: "
-							+ e.getMessage());
 				}
-			}
-			//System.out.println(count + "/" + (int)(del_items));
-			if(count == (int)(del_items)){
-				System.out.println("Items deleted: " + count);
-				client.shutdown(10, TimeUnit.SECONDS);
-				break;
+			} catch (Exception e) {
+				System.err.println("Exception while doing delete: "
+							+ e.getMessage());
 			}
 		}
 	}
@@ -221,16 +197,15 @@ public class LoadTaskWithObserve {
 		
 		System.out.println("Running thread1: ");
 		Thread thread1 = new Thread(myRunnable1);
-		thread1.start();	
 		System.out.println("Running thread2: ");
 		Thread thread2 = new Thread(myRunnable2);
+		thread1.start();
 		thread2.start();
+		thread1.join();
 		thread2.join();
 		System.out.println("Running thread3: ");
 		Thread thread3 = new Thread(myRunnable3);
 		thread3.start();
-		
-		thread1.join();
 		thread3.join();
 		
 		System.exit(0);
