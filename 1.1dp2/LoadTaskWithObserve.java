@@ -114,7 +114,9 @@ public class LoadTaskWithObserve {
 		while(true){
 			for(int i=1;i<=(int)(del_items);i++){
 				try {
-					OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i));;
+					OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i), PersistTo.Master);
+					assert.setOp.get.booleanValue() : "Key was not persisted to master";
+					
 					if (delOp.get().booleanValue() == false) {
 						System.err.println("Delete failed: " +
 								delOp.getStatus().getMessage());
