@@ -10,13 +10,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.File;
+import net.spy.memcached.PersistTo;
 
 import com.couchbase.client.CouchbaseClient;
-
-import net.spy.memcached.PersistTo;
 import net.spy.memcached.internal.OperationFuture;
 
-public class LoadTask {
+public class Mytest {
 			
 	private static int NUM_ITEMS = 0;
 	private static int EXPIRATION = 0;
@@ -55,25 +54,13 @@ public class LoadTask {
 			String Key = String.format("Key-%d", i);
 			String Value = String.format("%d", i);
 			OperationFuture<Boolean> setOp = client.set(Key, 0, Value);
-			if (setOp.get().booleanValue() == false) {
-				System.err.println("Set failed: " + 
-							setOp.getStatus().getMessage());
-			    break;
-			} else {
-				//System.out.println("Set Key: " + i);
-			}		
+			assert setOp.get().booleanValue();	
 		}
 		for(int i=(NUM_ITEMS - ITEMS_WITH_EXP + 1);i<=NUM_ITEMS;i++){
 			String Key = String.format("Key-%d", i);
 			String Value = String.format("%d", i);
 			OperationFuture<Boolean> setOp = client.set(Key, EXPIRATION, Value);
-			if (setOp.get().booleanValue() == false) {
-				System.err.println("Set failed: " + 
-							setOp.getStatus().getMessage());
-			    break;
-			} else {
-				//System.out.println("Set Key: " + i);
-			}		
+			assert setOp.get().booleanValue();	
 		}
 		client.shutdown(10, TimeUnit.SECONDS);
 	}
@@ -109,40 +96,32 @@ public class LoadTask {
 		double del_items = DEL_PERCENT * NUM_ITEMS;
 		CouchbaseClient client = connect();
 		int count = 0;
-		while(true){
-			for(int i=1;i<=(int)(del_items);i++){
-				try {
-					OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i));;
-					if (delOp.get().booleanValue() == false) {
-						System.err.println("Delete failed: " +
-								delOp.getStatus().getMessage());
+		for(int i=1;i<=(int)(del_items);i++){
+			try {
+				OperationFuture<Boolean> delOp = client.delete(String.format("Key-%d", i), PersistTo.MASTER);
+				assert !delOp.get().booleanValue() : "Key has persisted to master";
+				if (!delOp.get().booleanValue()){
+					count ++;
+					//System.out.println(count + "/" + (int)(del_items));
+					if(count == (int)(del_items))
 						break;
-					} else {
-						count ++;
-					}
-				} catch (Exception e) {
-					System.err.println("Exception while doing delete: "
-							+ e.getMessage());
 				}
-			}
-			//System.out.println(count + "/" + (int)(del_items));
-			if(count == (int)(del_items)){
-				System.out.println("Items deleted: " + count);
-				client.shutdown(10, TimeUnit.SECONDS);
-				break;
+			} catch (Exception e) {
+				System.err.println("Exception while doing delete: "
+							+ e.getMessage());
 			}
 		}
 	}
 	
-	/*
 	private static void replace_items() throws URISyntaxException, IOException {
 		double rep_items = REPLACE_PERCENT * NUM_ITEMS;
 		CouchbaseClient client = connect();
 		for(int i=NUM_ITEMS/2 + 1;i<=(NUM_ITEMS + (int)(rep_items));i++){
 			try{
-				OperationFuture<Boolean> repOp = client.replace(String.format("Key-%d", i), EXPIRATION, String.format("NEW-%d", i));
+				OperationFuture<Boolean> repOp = client.replace(String.format("Key-%d", i), EXPIRATION, String.format("NEW-%d", i), PersistTo.MASTER);
+				assert repOp.get().booleanValue() : "Key has persisted to master";
 				if(repOp.get().booleanValue())
-					System.out.println("Successfully replaced");
+					System.out.println("Key has persisted to master");
 				else
 					System.out.println("Key " + i + " wasn't replaced, for it doesn't exist");
 			} catch (Exception e) {
@@ -157,9 +136,10 @@ public class LoadTask {
 		CouchbaseClient client = connect();
 		for(int i=(int) (NUM_ITEMS*(0.9) + 1);i<=NUM_ITEMS*(0.9) + (int)(add_items);i++){
 			try{
-				OperationFuture<Boolean> addOp = client.add(String.format("Key-%d", i), EXPIRATION, String.format("%d", i));
+				OperationFuture<Boolean> addOp = client.add(String.format("Key-%d", i), EXPIRATION, String.format("%d", i), PersistTo.MASTER);
+				assert addOp.get().booleanValue() : "Key has persisted to master";				
 				if(addOp.get().booleanValue())
-					System.out.println("Successfully added");
+					System.out.println("Key has persisted to master");
 				else
 					System.out.println("Key already exists!");
 			} catch (Exception e) {
@@ -168,7 +148,6 @@ public class LoadTask {
 			}
 		}
 	}
-	*/
 	
 	@SuppressWarnings("rawtypes")
 	public static void main(String args[]) throws URISyntaxException, InterruptedException, ExecutionException, IOException{
@@ -247,7 +226,7 @@ public class LoadTask {
 		
 		Runnable myRunnable3 = new Runnable() {
 			public void run() {
-				if (do_delete_flag.equals("Yes") || do_delete_flag.equals("1")) {
+				if (do_delete_flag.equals("yes") || do_delete_flag.equals("1")) {
 					try {
 						delete_items();
 					} catch (URISyntaxException e) {
@@ -259,7 +238,6 @@ public class LoadTask {
 			}
 		};
 		
-		/*
 		Runnable myRunnable4 = new Runnable() {
 			public void run() {
 				if (do_replace_flag.equals("yes") || do_replace_flag.equals("1")){
@@ -287,30 +265,27 @@ public class LoadTask {
 				}
 			}
 		};
-		*/
 		
 		System.out.println("Running thread1: ");
 		Thread thread1 = new Thread(myRunnable1);
-		thread1.start();	
 		System.out.println("Running thread2: ");
 		Thread thread2 = new Thread(myRunnable2);
+		thread1.start();
 		thread2.start();
 		thread1.join();
 		thread2.join();
 		System.out.println("Running thread3: ");
 		Thread thread3 = new Thread(myRunnable3);
-		thread3.start();
-		/*
 		System.out.println("Running thread4: ");
 		Thread thread4 = new Thread(myRunnable4);
-		thread4.start();
 		System.out.println("Running thread5: ");
 		Thread thread5 = new Thread(myRunnable5);
+		thread3.start();
+		thread4.start();
 		thread5.start();
+		thread3.join();
 		thread4.join();
 		thread5.join();
-		*/
-		thread3.join();
 		
 		System.exit(0);
 	}

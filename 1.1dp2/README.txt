@@ -16,6 +16,10 @@ Instructions:
 	ratio-deletes
 	ddoc-name
 	view-name
+	do-replace (flag)
+	replace-ratio
+	do-add (flag)
+	add-ratio
 
 - make load
 - make view
