@@ -48,12 +48,15 @@ public class Mainhelper {
 	    
 	 }
 	 
+	 /*
+	  * Read Input parameters from test.properties
+	  * Run threads for set and get simultaneously. Wait for completion.
+	  * Run threads for delete, replace, add simultaneously. Wait for completion.
+	  * Query an already created view.
+	  */
 	 @SuppressWarnings("rawtypes")
 	 public static void main(String args[]) throws InterruptedException, URISyntaxException, IOException, ExecutionException {
 		 
-		 /*
-		  * Read all input parameters from test.properties
-		  */
 		 try {
 			File file = new File("test.properties");
 			FileInputStream fileInput = new FileInputStream(file);
@@ -207,8 +210,6 @@ public class Mainhelper {
 		thread1.join();
 		thread2.join();
 		
-                Thread.sleep(10000);
-                
 		System.out.println("Running thread to delete: ");
 		Thread thread3 = new Thread(myRunnable3);
 		thread3.start();
@@ -223,11 +224,8 @@ public class Mainhelper {
 		thread4.join();
 		thread5.join();
 		
-                Thread.sleep(20000);
-                
 		System.out.println("Querying a view: ");
 		System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
 		
-                System.exit(0);
 	}
 }
