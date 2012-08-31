@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 import java.io.File;
 
 import com.couchbase.client.CouchbaseClient;
+
+import net.spy.memcached.PersistTo;
 import net.spy.memcached.internal.OperationFuture;
 
 public class LoadTask {
@@ -25,6 +27,10 @@ public class LoadTask {
 	private static String serverAddr = "127.0.0.1";
 	private static String do_delete_flag = "No";
 	private static double DEL_PERCENT = 0.0;
+	private static String do_replace_flag = "No";
+	private static double REPLACE_PERCENT = 0.0;
+	private static String do_add_flag = "No";
+	private static double ADD_PERCENT = 0.0;
 	
 	 static final CouchbaseClient connect() throws URISyntaxException, IOException{
 		List<URI> uris = new LinkedList<URI>();
@@ -128,6 +134,42 @@ public class LoadTask {
 		}
 	}
 	
+	/*
+	private static void replace_items() throws URISyntaxException, IOException {
+		double rep_items = REPLACE_PERCENT * NUM_ITEMS;
+		CouchbaseClient client = connect();
+		for(int i=NUM_ITEMS/2 + 1;i<=(NUM_ITEMS + (int)(rep_items));i++){
+			try{
+				OperationFuture<Boolean> repOp = client.replace(String.format("Key-%d", i), EXPIRATION, String.format("NEW-%d", i));
+				if(repOp.get().booleanValue())
+					System.out.println("Successfully replaced");
+				else
+					System.out.println("Key " + i + " wasn't replaced, for it doesn't exist");
+			} catch (Exception e) {
+				System.err.println("Exception while doing replace: "
+						+ e.getMessage());
+			}
+		}
+	}
+	
+	private static void add_items() throws URISyntaxException, IOException {
+		double add_items = ADD_PERCENT * NUM_ITEMS;
+		CouchbaseClient client = connect();
+		for(int i=(int) (NUM_ITEMS*(0.9) + 1);i<=NUM_ITEMS*(0.9) + (int)(add_items);i++){
+			try{
+				OperationFuture<Boolean> addOp = client.add(String.format("Key-%d", i), EXPIRATION, String.format("%d", i));
+				if(addOp.get().booleanValue())
+					System.out.println("Successfully added");
+				else
+					System.out.println("Key already exists!");
+			} catch (Exception e) {
+				System.err.println("Exception while doing add: "
+						+ e.getMessage());
+			}
+		}
+	}
+	*/
+	
 	@SuppressWarnings("rawtypes")
 	public static void main(String args[]) throws URISyntaxException, InterruptedException, ExecutionException, IOException{
 		
@@ -159,6 +201,14 @@ public class LoadTask {
 					do_delete_flag = properties.getProperty(key);
 				else if(key.equals("ratio-deletes"))
 					DEL_PERCENT = Float.parseFloat(properties.getProperty(key));
+				else if(key.equals("do-replace"))
+					do_replace_flag = properties.getProperty(key);
+				else if(key.equals("replace-ratio"))
+					REPLACE_PERCENT = Float.parseFloat(properties.getProperty(key));
+				else if(key.equals("do-add"))
+					do_add_flag = properties.getProperty(key);
+				else if(key.equals("add-ratio"))
+					ADD_PERCENT = Float.parseFloat(properties.getProperty(key));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -209,18 +259,57 @@ public class LoadTask {
 			}
 		};
 		
+		/*
+		Runnable myRunnable4 = new Runnable() {
+			public void run() {
+				if (do_replace_flag.equals("yes") || do_replace_flag.equals("1")){
+					try {
+						replace_items();
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		
+		Runnable myRunnable5 = new Runnable() {
+			public void run() {
+				if (do_add_flag.equals("yes") || do_add_flag.equals("1")){
+					try {
+						add_items();
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		*/
+		
 		System.out.println("Running thread1: ");
 		Thread thread1 = new Thread(myRunnable1);
 		thread1.start();	
 		System.out.println("Running thread2: ");
 		Thread thread2 = new Thread(myRunnable2);
 		thread2.start();
+		thread1.join();
 		thread2.join();
 		System.out.println("Running thread3: ");
 		Thread thread3 = new Thread(myRunnable3);
 		thread3.start();
-		
-		thread1.join();
+		/*
+		System.out.println("Running thread4: ");
+		Thread thread4 = new Thread(myRunnable4);
+		thread4.start();
+		System.out.println("Running thread5: ");
+		Thread thread5 = new Thread(myRunnable5);
+		thread5.start();
+		thread4.join();
+		thread5.join();
+		*/
 		thread3.join();
 		
 		System.exit(0);
