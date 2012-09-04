@@ -29,7 +29,7 @@ Instructions:
 	- Replace
 	- Delete
 
-- These test sets and gets items asynchronously and then deletes, adds and replaces asynchronously and if a view has been set up, retrieves the content of the view or else simply outputs "result of load is false".
+- This test does sets and gets items asynchronously and then deletes, adds and replaces asynchronously and if a view has been set up, retrieves the content of the view or else simply outputs "result of load is false".
 	
 - Run Mainhelper to see results of the task at hand:
 	- Mainhelper:
