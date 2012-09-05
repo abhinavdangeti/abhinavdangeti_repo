@@ -17,7 +17,7 @@ public class Replacer {
 	public static void replace_items(int number_items, double ratio_replace, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException {
 		double rep_items = ratio_replace * number_items;
 		CouchbaseClient client = Mainhelper.connect();
-		for(int i=number_items/2 + 1;i<=(number_items + (int)(rep_items));i++){
+		for(int i=number_items/2 + 1;i<=((int)(number_items/2) + (int)(rep_items));i++){
 			try{
 				OperationFuture<Boolean> repOp = null;
 				if(OBSERVE){
