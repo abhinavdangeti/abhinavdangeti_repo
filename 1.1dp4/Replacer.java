@@ -27,7 +27,7 @@ public class Replacer {
 					repOp = client.replace(String.format("Key-%d", i), expiration, String.format("new-%d", i), PersistTo.MASTER);
 					assert repOp.get().booleanValue() : "Key has persisted to master";
 					long postOBS = System.nanoTime();
-					System.out.println("DELETE-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
+					System.out.println("REPLACE-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 					tot_time += (double)(postOBS - preOBS) / 1000000.0;
 				}else{
 					repOp = client.replace(String.format("Key-%d", i), expiration, String.format("new-%d", i));
