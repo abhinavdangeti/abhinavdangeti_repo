@@ -12,10 +12,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.couchbase.client.CouchbaseClient;
-
+import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 
 public class Mainhelper {
-
+ 
 	 private static int NUM_ITEMS = 0;
 	 private static int EXPIRATION = 0;
 	 private static double RATIO_EXP = 0;
@@ -234,6 +234,7 @@ public class Mainhelper {
 		System.out.println("Querying a view: ");
 		System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
 		
+		Thread.sleep(5000);
 		System.out.println("\n - - - - - - - - - - ");
 		System.out.println("LATENCY STATS :- ");
 		System.out.println("SETS: " + set_latency + "ms.");
