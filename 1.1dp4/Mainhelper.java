@@ -43,19 +43,19 @@ public class Mainhelper {
 	  * Establish connection with couchbase server
 	  */
 	 static final CouchbaseClient connect() throws URISyntaxException, IOException{
-	 	List<URI> uris = new LinkedList<URI>();
-	 	uris.add(URI.create(String.format("http://" + serverAddr + ":" + port + "/pools")));
-	 	CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
-        cfb.setObsPollInterval(OBS_POLL_INTERVAL);
-        cfb.setObsPollMax(OBS_POLL_MAX);
-	    try {
-	      return new CouchbaseClient(cfb.buildCouchbaseConnection(uris, BUCKET_NAME, BUCKET_PASSWD));
-	    } catch (Exception e) {
-	      System.err.println("Error connecting to Couchbase: "
-	        + e.getMessage());
-	      System.exit(0);
-	    }
-	    return null;
+	     List<URI> uris = new LinkedList<URI>();
+	     uris.add(URI.create(String.format("http://" + serverAddr + ":" + port + "/pools")));
+	     CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
+             cfb.setObsPollInterval(OBS_POLL_INTERVAL);
+             cfb.setObsPollMax(OBS_POLL_MAX);
+	     try {
+	     	return new CouchbaseClient(cfb.buildCouchbaseConnection(uris, BUCKET_NAME, BUCKET_PASSWD));
+	     } catch (Exception e) {
+	     	System.err.println("Error connecting to Couchbase: "
+	        	+ e.getMessage());
+	      	System.exit(0);
+	     }
+	     return null;
 	    
 	 }
 	 
