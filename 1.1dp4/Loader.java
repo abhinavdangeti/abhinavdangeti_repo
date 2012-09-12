@@ -7,8 +7,6 @@ import net.spy.memcached.PersistTo;
 import com.couchbase.client.CouchbaseClient;
 import net.spy.memcached.internal.OperationFuture;
 
-import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
-
 public class Loader {
 
 	/*
@@ -19,9 +17,6 @@ public class Loader {
 	public static double load_items(int number_items, double ratio_exp, int expiration, Boolean OBSERVE) 
 			throws URISyntaxException, IOException, InterruptedException, ExecutionException {
 		CouchbaseClient client = Mainhelper.connect();		
-		CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
-		cfb.setObsPollInterval(30);
-		cfb.setObsPollMax(10000);
 		int items_with_exp = (int)(number_items * ratio_exp);
 		double tot_time = 0.0;
 		for(int i=1;i<=(number_items - items_with_exp);i++){

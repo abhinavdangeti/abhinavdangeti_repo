@@ -22,6 +22,8 @@ Instructions:
 		add-ratio
 		ddoc-name
 		view-name
+		obs-poll-interval
+		obs-poll-max
 
 - Allowed operations:
 	- Load

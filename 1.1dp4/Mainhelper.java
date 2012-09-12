@@ -36,6 +36,8 @@ public class Mainhelper {
 	 private static double add_latency = 0.0;
 	 private static double replace_latency = 0.0;
 	 private static double delete_latency = 0.0;
+	 private static int OBS_POLL_INTERVAL = 400;	//Defaults on this as per the couchbase client
+	 private static int OBS_POLL_MAX = 10;			//Defaults on this as per the couchbase client
 	
 	 /*
 	  * Establish connection with couchbase server
@@ -43,9 +45,11 @@ public class Mainhelper {
 	 static final CouchbaseClient connect() throws URISyntaxException, IOException{
 	 	List<URI> uris = new LinkedList<URI>();
 	 	uris.add(URI.create(String.format("http://" + serverAddr + ":" + port + "/pools")));
-	    
+	 	CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
+        cfb.setObsPollInterval(OBS_POLL_INTERVAL);
+        cfb.setObsPollMax(OBS_POLL_MAX);
 	    try {
-	      return new CouchbaseClient(uris, BUCKET_NAME, BUCKET_PASSWD);
+	      return new CouchbaseClient(cfb.buildCouchbaseConnection(uris, BUCKET_NAME, BUCKET_PASSWD));
 	    } catch (Exception e) {
 	      System.err.println("Error connecting to Couchbase: "
 	        + e.getMessage());
@@ -106,6 +110,10 @@ public class Mainhelper {
 					ddoc_name = properties.getProperty(key);
 				else if(key.equals("view-name"))
 					view_name = properties.getProperty(key);
+				else if(key.equals("obs-poll-interval"))
+					OBS_POLL_INTERVAL = Integer.parseInt(properties.getProperty(key));
+				else if(key.equals("obs-poll-max"))
+					OBS_POLL_MAX = Integer.parseInt(properties.getProperty(key));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
