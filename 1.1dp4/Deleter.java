@@ -20,13 +20,17 @@ public class Deleter {
 		CouchbaseClient client = Mainhelper.connect();
 		int count = 0;
 		double tot_time = 0.0;
+		int obs_true=0,obs_false=0;
 		for(int i=1;i<=(int)(del_items);i++){
 			try {
 				OperationFuture<Boolean> delOp = null;
 				if(OBSERVE){
 					long preOBS = System.nanoTime();
 					delOp = client.delete(String.format("Key-%d", i), PersistTo.MASTER);
-					assert !delOp.get().booleanValue() : "Key has persisted to master";
+					if(delOp.get().booleanValue())
+						obs_true++;
+					else
+						obs_false++;
 					long postOBS = System.nanoTime();
 					System.out.println("DELETE-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 					tot_time += (double)(postOBS - preOBS) / 1000000.0;
@@ -45,6 +49,7 @@ public class Deleter {
 			}
 		}
 		if (OBSERVE)
+			System.out.println("No. of deletes that actually persisted: " + obs_true);
 			System.out.println("AVERAGE LATENCY SEEN FOR ALL DELETES WITH OBSERVE: " + (tot_time / del_items));
 		client.shutdown(10, TimeUnit.SECONDS);
 		return (tot_time / del_items);

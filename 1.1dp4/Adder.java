@@ -19,13 +19,17 @@ public class Adder {
 		double add_items = ratio_add * number_items;
 		CouchbaseClient client = Mainhelper.connect();
 		double tot_time = 0.0;
+		int obs_true=0, obs_false=0;
 		for(int i=number_items;i<=number_items + (int)(add_items);i++){
 			try{
 				OperationFuture<Boolean> addOp = null;
 				if(OBSERVE){
 					long preOBS = System.nanoTime();
 					addOp = client.add(String.format("Key-%d", i), expiration, String.format("%d", i), PersistTo.MASTER);
-					assert addOp.get().booleanValue() : "Key has persisted to master";
+					if(addOp.get().booleanValue())
+						obs_true++;
+					else
+						obs_false++;
 					long postOBS = System.nanoTime();
 					System.out.println("ADD-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 					tot_time +=  (double)(postOBS - preOBS) / 1000000.0;
@@ -44,6 +48,7 @@ public class Adder {
 			}
 		}
 		if(OBSERVE)
+			System.out.println("No. of added items that actually persisted to disk: " + obs_true);
 			System.out.println("AVERAGE LATENCY SEEN FOR ALL ADDS WITH OBSERVE: " + (tot_time / add_items));
 		client.shutdown(10, TimeUnit.SECONDS);
 		return (tot_time / add_items);
