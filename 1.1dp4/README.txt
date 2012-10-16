@@ -45,8 +45,8 @@ Instructions:
 	- Mainhelper:
 		make Mainhelper
 		make RunMainhelper
-	- ViewQuery
+	- ViewQuery:
 		make ViewQuery
 		make RunViewQuery
-	- Clean
+	- Remove ".class" files:
 		make clean
