@@ -11,6 +11,8 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.codehaus.jettison.json.JSONException;
+
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 
@@ -133,6 +135,9 @@ public class Mainhelper {
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}			
