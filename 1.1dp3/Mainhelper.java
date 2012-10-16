@@ -201,6 +201,9 @@ public class Mainhelper {
 						e.printStackTrace();
 					} catch (IOException e) {
 						e.printStackTrace();
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
@@ -210,10 +213,13 @@ public class Mainhelper {
 			public void run() {
 				if (do_add_flag.equals("yes") || do_add_flag.equals("1")){
 					try {
-						add_latency = Adder.add_item(NUM_ITEMS, ADD_PERCENT, EXPIRATION, OBSERVE);
+						add_latency = Adder.add_items(NUM_ITEMS, ADD_PERCENT, EXPIRATION, OBSERVE);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

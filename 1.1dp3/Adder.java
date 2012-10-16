@@ -1,6 +1,10 @@
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import net.spy.memcached.PersistTo;
 import net.spy.memcached.internal.OperationFuture;
@@ -13,19 +17,24 @@ public class Adder {
 	/*
 	 * Method that adds x number of items after NUM_ITEMS
 	 * Enabling OBSERVE, makes the adder check if every item created has persisted or not.
-	 * Inserted items have key [Key-i] and corresponding value [i].
+	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
-	public static double add_item(int number_items, double ratio_add, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException {
+	@SuppressWarnings("unused")
+	public static double add_items(int number_items, double ratio_add, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException, JSONException {
 		double add_items = ratio_add * number_items;
 		CouchbaseClient client = Mainhelper.connect();
 		double tot_time = 0.0;
 		int obs_true=0, obs_false=0;
+		Random generator = new Random( 123456789 );
 		for(int i=number_items;i<=number_items + (int)(add_items);i++){
+			String Key = String.format("Key-%d", i);
+			//String Value = String.format("%d", i);
+			JSONObject Value = retrieveJSON(i, generator);
 			try{
 				OperationFuture<Boolean> addOp = null;
 				if(OBSERVE){
 					long preOBS = System.nanoTime();
-					addOp = client.add(String.format("Key-%d", i), expiration, String.format("%d", i), PersistTo.MASTER);
+					addOp = client.add(Key, expiration, Value.toString(), PersistTo.MASTER);
 					if(addOp.get().booleanValue())
 						obs_true++;
 					else
@@ -34,7 +43,7 @@ public class Adder {
 					System.out.println("ADD-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 					tot_time +=  (double)(postOBS - preOBS) / 1000000.0;
 				}else{
-					addOp = client.add(String.format("Key-%d", i), expiration, String.format("%d", i));
+					addOp = client.add(Key, expiration, Value.toString());
 				}	
 //				if(addOp.get().booleanValue())
 //					System.out.println("Key-" + i + " has persisted to master");
@@ -52,5 +61,31 @@ public class Adder {
 			System.out.println("AVERAGE LATENCY SEEN FOR ALL ADDS WITH OBSERVE: " + (tot_time / add_items));
 		client.shutdown(10, TimeUnit.SECONDS);
 		return (tot_time / add_items);
+	}
+	
+	private static JSONObject retrieveJSON(int i, Random gen) throws JSONException {
+		String _number = null;
+        Integer temp = gen.nextInt();
+        JSONObject jsonobj = null;
+        if(temp % 2 == 0){
+            _number = "e" + temp.toString();
+            jsonobj = new JSONObject("{\"planet\":\"earth\", \"species\":\"human\", \"number\":\"" + _number + "\"}");
+        } else if(temp % 3 == 0) {
+            _number = "m" + temp.toString();
+            jsonobj = new JSONObject("{\"planet\":\"mars\", \"species\":\"martian\", \"number\":\"" + _number + "\"}");
+        } else if(temp % 10 == 1) {
+            _number = "v" + temp.toString();
+            jsonobj = new JSONObject("{\"planet\":\"venus\", \"species\":\"venusses\", \"number\":\"" + _number + "\"}");
+        } else if(temp % 10 == 3) {
+            _number = "j" + temp.toString();
+            jsonobj = new JSONObject("{\"planet\":\"jupiter\", \"species\":\"jupitorian\", \"number\":\"" + _number + "\"}");
+        } else if(temp % 10 == 5) {
+            _number = "s" + temp.toString();
+            jsonobj = new JSONObject("{\"planet\":\"saturn\", \"species\":\"saturness\", \"number\":\"" + _number + "\"}");
+		} else {
+            _number = "u" + temp.toString();
+            jsonobj = new JSONObject("{\"planet\":\"unknown\", \"species\":\"unknown\", \"number\":\"" + _number + "\"}");
+        }
+		return jsonobj;
 	}
 }

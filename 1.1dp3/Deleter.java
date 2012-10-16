@@ -15,6 +15,7 @@ public class Deleter {
 	 * Enabling OBSERVE, makes the deleter check whether every item deleted has persisted even after deleting or not.
 	 * Items are deleted based on the key.
 	 */
+	@SuppressWarnings("unused")
 	public static double delete_items(int number_items, double ratio_delete, Boolean OBSERVE) throws URISyntaxException, IOException {
 		double del_items = ratio_delete * number_items;
 		CouchbaseClient client = Mainhelper.connect();

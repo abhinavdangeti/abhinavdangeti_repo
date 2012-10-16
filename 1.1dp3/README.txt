@@ -26,8 +26,8 @@ Instructions:
 		obs-poll-max
 
 - Allowed operations:
-	- Load
-	- Add
+	- Load: Loads key-json_doc pairs
+	- Add: Adds key-json_doc pairs
 	- Replace
 	- Delete
 

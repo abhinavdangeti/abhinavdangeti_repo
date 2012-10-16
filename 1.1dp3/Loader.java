@@ -16,7 +16,7 @@ public class Loader {
 	/*
 	 * Method that loads items from 1 to NUM_ITEMS.
 	 * Enabling OBSERVE, makes the loader check if every item created has persisted or not.
-	 * Inserted items have key [Key-i] and corresponding value [i].
+	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
 	public static double load_items(int number_items, double ratio_exp, int expiration, Boolean OBSERVE) 
 			throws URISyntaxException, IOException, InterruptedException, ExecutionException, JSONException {
