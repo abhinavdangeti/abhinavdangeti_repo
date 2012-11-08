@@ -38,8 +38,9 @@ public class Mainhelper {
 	 private static double add_latency = 0.0;
 	 private static double replace_latency = 0.0;
 	 private static double delete_latency = 0.0;
-	 private static int OBS_POLL_INTERVAL = 400;	//Defaults on this as per the couchbase client
-	 private static int OBS_POLL_MAX = 10;			//Defaults on this as per the couchbase client
+	 private static int OBS_POLL_INTERVAL = 400;	//Defaults on 100ms as per the couchbase client
+	 private static int OBS_POLL_MAX = 10;		//Defaults on 400 as per the couchbase client
+							//Polls MAX no. of times for interval no. of ms
 	
 	 /*
 	  * Establish connection with couchbase server
