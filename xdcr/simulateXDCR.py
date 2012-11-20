@@ -55,6 +55,7 @@ class sim(XDCRReplicationBaseTest):
         self._load_all_buckets(self.src_master, self.gen_create, "create", 0)    
         if self._replication_direction_str in "bidirection":
             self._load_all_buckets(self.dest_master, self.gen_create2, "create", 0)
+        time.sleep(self._timeout)
         
         start_time = datetime.datetime.now()
         while True:
