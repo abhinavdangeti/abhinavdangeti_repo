@@ -72,7 +72,7 @@ class sim(XDCRReplicationBaseTest):
                         item_count = len(valid_keys) + len(deleted_keys)
                     g_update1 = BlobGenerator('loadOne', 'loadOne-', self._value_size, start=0, 
                                               end=int(item_count * (float)(self._percent_update) / 100))
-                    self._load_all_buckets(self.src_master, g_update1, "update", 120)    
+                    self._load_all_buckets(self.src_master, g_update1, "update", self._expires)    
                     if self._replication_direction_str in "bidirection":
                         dest_buckets = self._get_cluster_buckets(self.dest_master)
                         for bucket in dest_buckets:
@@ -80,7 +80,7 @@ class sim(XDCRReplicationBaseTest):
                             item_count = len(valid_keys) + len(deleted_keys)
                         g_update2 = BlobGenerator('loadTwo', 'loadTwo-', self._value_size, start=0, 
                                                   end=int(item_count * (float)(self._percent_update) / 100))
-                        self._load_all_buckets(self.dest_master, g_update2, "update", 120)
+                        self._load_all_buckets(self.dest_master, g_update2, "update", self._expires)
                 time.sleep(self._timeout / 2)
             tasks = []
 
@@ -343,7 +343,7 @@ class sim(XDCRReplicationBaseTest):
                     item_count = len(valid_keys) + len(deleted_keys)
                 g_delete1 = BlobGenerator('loadOne', 'loadOne-', self._value_size, 
                                           start=int((item_count) * (float)(100 - self._percent_delete) / 100), end=item_count)
-                self._load_all_buckets(self.src_master, g_delete1, "update", 120)    
+                self._load_all_buckets(self.src_master, g_delete1, "delete", 0)    
                 if self._replication_direction_str in "bidirection":
                     dest_buckets = self._get_cluster_buckets(self.dest_master)
                     for bucket in dest_buckets:
@@ -351,7 +351,7 @@ class sim(XDCRReplicationBaseTest):
                         item_count = len(valid_keys) + len(deleted_keys)
                     g_delete2 = BlobGenerator('loadTwo', 'loadTwo-', self._value_size, 
                                               start=int((item_count) * (float)(100 - self._percent_delete) / 100), end=item_count)
-                    self._load_all_buckets(self.dest_master, g_delete2, "update", 120)
+                    self._load_all_buckets(self.dest_master, g_delete2, "delete", 0)
                 time.sleep(self._timeout)
 
             for task in tasks:
