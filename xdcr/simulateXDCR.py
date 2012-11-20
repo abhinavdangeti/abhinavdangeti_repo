@@ -363,6 +363,7 @@ class sim(XDCRReplicationBaseTest):
             self._log.info(str)
             self._output_.extend([str])
             self._log.info("UPTIME: {0} seconds".format((task_done - start_time).seconds))
+            time.sleep(self._timeout)
             #STOP RUN AFTER 2 HOURS OR 10 TESTS, WHICHEVER COMES FIRST
             if (task_done - start_time).seconds > 7200 or self._test_count >= 10:
                 self._log.info("Run time: {0} hours :: Stopping now!...".format((float)((task_done - start_time).seconds)/3600))
