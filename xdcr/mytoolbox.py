@@ -130,3 +130,30 @@ class test(XDCRReplicationBaseTest):
             self.verify_results(verify_src=True)
         else:
             print "cbrestore not executed"
+
+    def load_with_my_ops(self):
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
+        raw_input("LOAD COMPLETED ON SOURCE, press ENTER to continue..")
+
+#        tasks = []
+#        if self._doc_ops is not None:
+#            if "update" in self._doc_ops:
+#                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires))
+#            if "delete" in self._doc_ops:
+#                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_delete, "delete", 0))
+#        for task in tasks:
+#            task.result()
+
+        time.sleep(self._timeout / 6)
+        self.verify_results(verify_src=True)
+
+    def special_test(self):
+        for server in self._servers:
+            shell = RemoteMachineShellConnection(server)
+            shell.set_environment_variable('XDCR_CAPI_CHECKPOINT_TIMEOUT', 10)
+            
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
+        raw_input("LOAD COMPLETED ON SOURCE, press ENTER to continue..")
+
+        time.sleep(self._timeout / 6)
+        self.verify_results(verify_src=True)
