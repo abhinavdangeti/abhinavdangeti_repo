@@ -212,7 +212,7 @@ class sim(XDCRReplicationBaseTest):
                 task_name = "Rebalance_out_on_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if len(self.dest_nodes) > 1:
-                    remove_nodes = self.dest_nodes[len(self.dest_nodes) - 1]
+                    remove_node = self.dest_nodes[len(self.dest_nodes) - 1]
                     tasks.extend(self._async_rebalance(self.dest_nodes, [], [remove_node]))
                     self._log.info("Starting rebalance-out node {0} at Destination cluster {1}".format(remove_node.ip,
                                                                                                        self.dest_master.ip))
