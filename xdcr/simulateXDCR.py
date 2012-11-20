@@ -80,6 +80,7 @@ class sim(XDCRReplicationBaseTest):
                         g_update2 = BlobGenerator('loadTwo', 'loadTwo-', self._value_size, start=0, 
                                                   end=int(item_count * (float)(self._percent_update) / 100))
                         self._load_all_buckets(self.dest_master, g_update2, "update", 120)
+                time.sleep(self._timeout / 2)
             tasks = []
 
             if _r%31==0:
@@ -350,6 +351,7 @@ class sim(XDCRReplicationBaseTest):
                     g_delete2 = BlobGenerator('loadTwo', 'loadTwo-', self._value_size, 
                                               start=int((item_count) * (float)(100 - self._percent_delete) / 100), end=item_count)
                     self._load_all_buckets(self.dest_master, g_delete2, "update", 120)
+                time.sleep(self._timeout)
 
             for task in tasks:
                 task.result()
