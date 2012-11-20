@@ -121,7 +121,7 @@ class sim(XDCRReplicationBaseTest):
                         self.log.info("unable to failover the node the first time. try again in  60 seconds..")
                         time.sleep(60)
                         failed_over = rest.fail_over(node.id)
-                    self.assertTrue(failed_over, "unable to failover node after {0}".format(failover_reason))
+                    self.assertTrue(failed_over, "unable to failover node")
                     self._log.info("failed over node : {0}".format(node.id))
                 rest.rebalance(otpNodes=[node.id for node in nodes],
                                ejectedNodes=[node.id for node in chosen])
@@ -357,13 +357,6 @@ class sim(XDCRReplicationBaseTest):
             for task in tasks:
                 task.result()
 
-            if self._replication_direction_str in "unidirection":
-                self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
-                self.verify_results()
-            elif self._replication_direction_str in "bidirection":
-                self.merge_buckets(self.src_master, self.dest_master, bidirection=True)
-                self.verify_results(verify_src=True)
-
             task_done = datetime.datetime.now()
             self._log.info("===> NO. OF TESTS RUN SO FAR: {0}".format(self._test_count))
             str = "TASK: {0}:: RUN_TIME: {1} seconds :: with update-ops: {2} and delete-ops: {3}".format(task_name, ((task_done - task_begin).seconds), ((toss1%2)!=1), ((toss2%2)!=1))
@@ -374,6 +367,13 @@ class sim(XDCRReplicationBaseTest):
             if (task_done - start_time).seconds > 7200 or self._test_count >= 10:
                 self._log.info("Run time: {0} hours :: Stopping now!...".format((float)((task_done - start_time).seconds)/3600))
                 break
+
+        if self._replication_direction_str in "unidirection":
+            self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
+            self.verify_results()
+        elif self._replication_direction_str in "bidirection":
+            self.merge_buckets(self.src_master, self.dest_master, bidirection=True)
+            self.verify_results(verify_src=True)
 
         fin_time = datetime.datetime.now()
         self._log.info(" = = = = = = = = = = = = = = = RESULTS = = = = = = = = = = = = = = = ")
