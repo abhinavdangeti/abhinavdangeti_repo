@@ -61,7 +61,7 @@ class sim(XDCRReplicationBaseTest):
             _r = random.randint(0,N)
             toss1 = random.randint(0,1000)
             task_begin = datetime.datetime.now()
-            if _r%8==0 or _r%10==0 or _r%12==0 or _r%14==0 or _r%9==0 or _r%11==0 or _r%13==0 or _r%17==0 or _r%19==0 or _r%23==0 or _r%29==0 or _r%31==0 or _r%37==0:
+            if _r%31==0 or _r%37==0 or _r%13==0 or _r%17==0 or _r%29==0 or _r%7==0 or _r%11==0 or _r%5==0 or _r%19==0 or _r%23==0 or _r%41==0 or _r%43==0 or _r%47==0:
                 if toss1 % 2 == 0:
                     self._log.info("UPDATE OPS IN PROGRESS ... ")
                     src_buckets = self._get_cluster_buckets(self.src_master)
@@ -81,7 +81,7 @@ class sim(XDCRReplicationBaseTest):
                         self._load_all_buckets(self.dest_master, g_update2, "update", 120)
             tasks = []
 
-            if _r%8==0:
+            if _r%31==0:
                 task_name = "Rebalance_in_on_source"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if self._floating_servers_set is None:
@@ -93,7 +93,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout / 3)
                 self._test_count += 1
 
-            elif _r%10==0:
+            elif _r%37==0:
                 task_name = "Rebalance_in_on_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if self._floating_servers_set is None:
@@ -105,7 +105,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout / 3)
                 self._test_count += 1
 
-            elif _r%12==0:
+            elif _r%13==0:
                 task_name = "Failover_on_source"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 rest = RestConnection(self.src_master)
@@ -131,7 +131,7 @@ class sim(XDCRReplicationBaseTest):
                             self._floating_servers_set.extend([server])
                 self._test_count += 1
 
-            elif _r%14==0:
+            elif _r%17==0:
                 task_name = "Failover_on_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 rest = RestConnection(self.dest_master)
@@ -157,7 +157,7 @@ class sim(XDCRReplicationBaseTest):
                             self._floating_servers_set.extend([server])
                 self._test_count += 1
 
-            elif _r%9==0:
+            elif _r%29==0:
                 task_name = "Failover_one_on_source_&_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if len(self.src_nodes) > 1 and len(self.dest_nodes) > 1:
@@ -191,7 +191,7 @@ class sim(XDCRReplicationBaseTest):
                         self._log.info("Number of nodes {0} is less than minimum '2' needed for failover on a cluster.".format(
                                     len(self.dest_nodes)))
 
-            elif _r%11==0:
+            elif _r%7==0:
                 task_name = "Rebalance_out_on_source"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if len(self.src_nodes) > 1:
@@ -206,7 +206,7 @@ class sim(XDCRReplicationBaseTest):
                     self._log.info("Number of nodes {0} is less than minimum '2' needed for failover on cluster.".format(
                                     len(self.src_nodes)))
 
-            elif _r%13==0:
+            elif _r%11==0:
                 task_name = "Rebalance_out_on_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if len(self.dest_nodes) > 1:
@@ -221,7 +221,7 @@ class sim(XDCRReplicationBaseTest):
                     self._log.info("Number of nodes {0} is less than minimum '2' needed for failover on cluster".format(
                                     len(self.dest_nodes)))
 
-            elif _r%17==0:
+            elif _r%5==0:
                 task_name = "Swap_rebalance_one_on_source_and_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if len(self._floating_servers_set) < 2:
@@ -271,7 +271,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout * 3 / 2)
                 self._test_count += 1
 
-            elif _r%29==0:
+            elif _r%41==0:
                 task_name = "Stop_couchbase_servers_destination_restart_after_15min"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 time.sleep(self._timeout / 6)
@@ -287,7 +287,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout * 3 / 2)
                 self._test_count += 1
 
-            elif _r%31==0:
+            elif _r%43==0:
                 task_name = "Stop_couchbase_servers_source_restart_after_15min"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 time.sleep(self._timeout / 6)
@@ -303,7 +303,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout * 3 / 2)
                 self._test_count += 1
 
-            elif _r%37==0:
+            elif _r%47==0:
                 task_name = "Simulate_autofailover_on_source_&_destination_by_enabling_firewall"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if len(self.src_nodes) < 2 or len(self.dest_nodes) < 2:
