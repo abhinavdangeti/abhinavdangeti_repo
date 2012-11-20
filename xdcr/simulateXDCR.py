@@ -61,7 +61,7 @@ class sim(XDCRReplicationBaseTest):
             _r = random.randint(0,N)
             toss1 = random.randint(0,1000)
             task_begin = datetime.datetime.now()
-            if _r%4==0 or _r%5==0 or _r%6==0 or _r%7==0 or _r%9==0 or _r%11==0 or _r%13==0 or _r%17==0 or _r%19==0 or _r%23==0 or _r%29==0 or _r%31==0 or _r%37==0:
+            if _r%8==0 or _r%10==0 or _r%12==0 or _r%14==0 or _r%9==0 or _r%11==0 or _r%13==0 or _r%17==0 or _r%19==0 or _r%23==0 or _r%29==0 or _r%31==0 or _r%37==0:
                 if toss1 % 2 == 0:
                     self._log.info("UPDATE OPS IN PROGRESS ... ")
                     src_buckets = self._get_cluster_buckets(self.src_master)
@@ -81,7 +81,7 @@ class sim(XDCRReplicationBaseTest):
                         self._load_all_buckets(self.dest_master, g_update2, "update", 120)
             tasks = []
 
-            if _r%4==0:
+            if _r%8==0:
                 task_name = "Rebalance_in_on_source"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if self._floating_servers_set is None:
@@ -93,7 +93,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout / 3)
                 self._test_count += 1
 
-            elif _r%5==0:
+            elif _r%10==0:
                 task_name = "Rebalance_in_on_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 if self._floating_servers_set is None:
@@ -105,7 +105,7 @@ class sim(XDCRReplicationBaseTest):
                 time.sleep(self._timeout / 3)
                 self._test_count += 1
 
-            elif _r%6==0:
+            elif _r%12==0:
                 task_name = "Failover_on_source"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 rest = RestConnection(self.src_master)
@@ -131,7 +131,7 @@ class sim(XDCRReplicationBaseTest):
                             self._floating_servers_set.extend([server])
                 self._test_count += 1
 
-            elif _r%7==0:
+            elif _r%14==0:
                 task_name = "Failover_on_destination"
                 self._log.info(" - - - - - {0} - - - - - ".format(task_name))
                 rest = RestConnection(self.dest_master)
