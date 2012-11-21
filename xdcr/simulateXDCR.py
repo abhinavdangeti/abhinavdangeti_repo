@@ -240,16 +240,16 @@ class sim(XDCRReplicationBaseTest):
                 self._log.info("Starting swap-rebalance at Source cluster {0} add node {1} and remove node {2}".format(
                                 self.src_master.ip, add_node1.ip, remove_node1.ip))
                 self.src_nodes.remove(remove_node1)
-                self.src_nodes.append(add_node1)
-                self._floating_servers_set.append(remove_node1)
+                self.src_nodes.extend([add_node1])
+                self._floating_servers_set.extend([remove_node1])
 
                 remove_node2 = self.dest_nodes[len(self.dest_nodes) - 1]
                 tasks.extend(self._async_rebalance(self.dest_nodes, [add_node2], [remove_node2]))
                 self._log.info("Starting swap-rebalance at Destination cluster {0} add node {1} and remove node {2}".format(
                                 self.dest_master.ip, add_node2.ip, remove_node2.ip))
                 self.dest_nodes.remove(remove_node2)
-                self.dest_nodes.append(add_node2)
-                self._floating_servers_set.append(remove_node2)
+                self.dest_nodes.extend([add_node2])
+                self._floating_servers_set.extend([remove_node2])
                 self._test_count += 1
 
             elif _r%19==0:
@@ -316,19 +316,20 @@ class sim(XDCRReplicationBaseTest):
                 rest = RestConnection(self.dest_master)
                 rest.update_autofailover_settings(True, self._timeout / 2) 
 
-                node = self.src_nodes[random.randrange(1, len(self.src_nodes))]
-                self._enable_firewall(node)
+                node1 = self.src_nodes[random.randrange(1, len(self.src_nodes))]
+                self._enable_firewall(node1)
                 basesim.wait_for_failover_or_assert(self.src_master, 1, self._timeout)
-                tasks.extend(self._cluster_helper.rebalance(self.src_nodes, [], [node]))
-                self.src_nodes.remove(node)
-                self._floating_servers_set(node)
+                tasks.extend(self._cluster_helper.rebalance(self.src_nodes, [], [node1]))
+                self.src_nodes.remove(node1)
+                self._floating_servers_set.extend([node1])
+                self._disable_firewall(node1)
 
-                node = self.src_nodes[random.randrange(1, len(self.dest_nodes))]
-                self._enable_firewall(node)
+                node2 = self.dest_nodes[random.randrange(1, len(self.dest_nodes))]
+                self._enable_firewall(node2)
                 basesim.wait_for_failover_or_assert(self.dest_master, 1, self._timeout)
-                tasks.extend(self._cluster_helper.rebalance(self.dest_nodes, [], [node]))
-                self.dest_nodes.remove(node)
-                self._floating_servers_set(node)
+                tasks.extend(self._cluster_helper.rebalance(self.dest_nodes, [], [node2]))
+                self.dest_nodes.remove(node2)
+                self._floating_servers_set.extend([node2])
                 self._test_count += 1
 
             else:
