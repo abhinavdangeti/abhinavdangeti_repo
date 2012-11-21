@@ -330,6 +330,7 @@ class sim(XDCRReplicationBaseTest):
                 tasks.extend(self._cluster_helper.rebalance(self.dest_nodes, [], [node2]))
                 self.dest_nodes.remove(node2)
                 self._floating_servers_set.extend([node2])
+                self._disable_firewall(node2)
                 self._test_count += 1
 
             else:
