@@ -235,21 +235,21 @@ class sim(XDCRReplicationBaseTest):
                 if len(self.src_nodes) < 2 or len(self.dest_nodes) < 2:
                     continue
 
-                remove_node = self.src_nodes[len(self.src_nodes) - 1]
-                tasks.extend(self._async_rebalance(self.src_nodes, [add_node1], [remove_node]))
+                remove_node1 = self.src_nodes[len(self.src_nodes) - 1]
+                tasks.extend(self._async_rebalance(self.src_nodes, [add_node1], [remove_node1]))
                 self._log.info("Starting swap-rebalance at Source cluster {0} add node {1} and remove node {2}".format(
-                                self.src_master.ip, add_node1.ip, remove_node.ip))
-                self.src_nodes.remove(remove_node)
+                                self.src_master.ip, add_node1.ip, remove_node1.ip))
+                self.src_nodes.remove(remove_node1)
                 self.src_nodes.append(add_node1)
-                self._floating_servers_set.append(remove_node)
+                self._floating_servers_set.append(remove_node1)
 
-                remove_node = self.dest_nodes[len(self.dest_nodes) - 1]
-                tasks.extend(self._async_rebalance(self.dest_nodes, [add_node2], [remove_node]))
+                remove_node2 = self.dest_nodes[len(self.dest_nodes) - 1]
+                tasks.extend(self._async_rebalance(self.dest_nodes, [add_node2], [remove_node2]))
                 self._log.info("Starting swap-rebalance at Destination cluster {0} add node {1} and remove node {2}".format(
-                                self.dest_master.ip, add_node2.ip, remove_node.ip))
-                self.dest_nodes.remove(remove_node)
+                                self.dest_master.ip, add_node2.ip, remove_node2.ip))
+                self.dest_nodes.remove(remove_node2)
                 self.dest_nodes.append(add_node2)
-                self._floating_servers_set.append(remove_node)
+                self._floating_servers_set.append(remove_node2)
                 self._test_count += 1
 
             elif _r%19==0:
