@@ -242,6 +242,7 @@ class sim(XDCRReplicationBaseTest):
                 self.src_nodes.remove(remove_node1)
                 self.src_nodes.extend([add_node1])
                 self._floating_servers_set.extend([remove_node1])
+                self._floating_servers_set.remove(add_node1)
 
                 remove_node2 = self.dest_nodes[len(self.dest_nodes) - 1]
                 tasks.extend(self._async_rebalance(self.dest_nodes, [add_node2], [remove_node2]))
@@ -250,6 +251,7 @@ class sim(XDCRReplicationBaseTest):
                 self.dest_nodes.remove(remove_node2)
                 self.dest_nodes.extend([add_node2])
                 self._floating_servers_set.extend([remove_node2])
+                self._floating_servers_set.remove(add_node2)
                 self._test_count += 1
 
             elif _r%19==0:
