@@ -385,5 +385,5 @@ class sim(XDCRReplicationBaseTest):
         self._log.info("XDCR: {0} ; TOPOLOGY: {1}".format(self._replication_direction_str, self._cluster_topology_str))
         for i in range(len(self._output_)):
             self._log.info(self._output_[i])
-        self._log.info("TOTAL RUN TIME: {0} seconds".format((fin_time - start_time)))
+        self._log.info("TOTAL RUN TIME: {0}".format((fin_time - start_time)))
         self._log.info(" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ")
