@@ -175,8 +175,8 @@ class sim(XDCRReplicationBaseTest):
                     self._cluster_helper.failover(self.dest_nodes, [self.dest_nodes[j]])
                     self._log.info(" Rebalance out Source Non-Master Node {0}:{1}".format(self.src_nodes[i].ip,
                                                                                           self.src_nodes[i].port))
-                    self._log.info(" Rebalance out Destination Non-Master Node {0}:{1}".format(self.dest_nodes[i].ip,
-                                                                                          self.dest_nodes[i].port))
+                    self._log.info(" Rebalance out Destination Non-Master Node {0}:{1}".format(self.dest_nodes[j].ip,
+                                                                                          self.dest_nodes[j].port))
                     tasks.extend(self._async_rebalance(self.src_nodes, [], [self.src_nodes[i]]))
                     tasks.extend(self._async_rebalance(self.dest_nodes, [], [self.dest_nodes[j]]))
                     removed_nodes.append(self.src_nodes[i])
