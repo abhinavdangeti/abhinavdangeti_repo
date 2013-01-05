@@ -1,0 +1,87 @@
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+SETTING UP SERIESLY - CBMONITOR
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+Prerequsites:
+Python 2.6/2.7
+python-pip
+
+wget https://launchpad.net/libtool/main/2.4.2/+download/libtool-2.4.2.tar.gz
+configure - make - make install
+
+sudo apt-get install autotools-dev
+sudo apt-get install automake
+
+wget http://mirror.anl.gov/pub/ubuntu//pool/universe/s/snappy/libsnappy1_1.0.3-1_amd64.deb
+sudo dpkg -i libsnappy1_1.0.3-1_amd64.deb 
+
+wget http://mirror.anl.gov/pub/ubuntu//pool/universe/s/snappy/libsnappy-dev_1.0.3-1_amd64.deb
+sudo dpkg -i libsnappy-dev_1.0.3-1_amd64.deb 
+
+sudo apt-get install python-software-properties
+sudo apt-get update
+
+pip install pil
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Go:
+As per http://golang.org/doc/install ,
+{
+http://go.googlecode.com/files/go1.0.3.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.0.3.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
+}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Get couchstore:
+git clone https://github.com/couchbaselabs/couchstore.git
+config/autorun.sh - configure - make - make install
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Installing seriesly:
+go get -u -v github.com/dustin/seriesly
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SET THE ENV PATHS:
+export LD_LIBRARY_PATH='/usr/local/lib/'
+export PATH=$PATH:/usr/local/go/bin/
+
+or more permenantly:
+
+edit ~/.bashrc
+add the export commands.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Get the cbmonitor package:
+git clone https://github.com/couchbase/cbmonitor.git
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+MERGING CBMONITOR WITH PYSYSTESTS:
+- copy contents of cbmonitor into testrunner/pysystests/
+- Edit app/init.py under pysystests
+	Add these lines, at the end:
+
+		# start cbtop (ensure seriesly is running)
+		os.system("nohup ./cbtop -b {0} &".format(cfg.COUCHBASE_IP))
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+REPORT GENERATION:
+- To generate the report add file compile_report.py, slight change in plotter.py
+	compile_report.py in testrunner/pysystests/
+	Run as: python compile_report.py [db_name]
+	db_name: fast / slow
+	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/compile_report.py
+	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/plotter.py
+
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+RUNNING THE SETUP:
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+- Start up rabbit - broker
+- On one of the workers (the chosen) scheduler, start up seriesly (default port: 3133)
+- Run celery, (cbtop gets kicked off, runs in background, writes to seriesly)
+- Start up the work loads as before.
+- At any point / at the end of the test, with seriesly still running run compile_report against one of the databases (fast/slow), as:
+	python compile_report.py fast
+	python compile_report.py slow
+
