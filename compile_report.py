@@ -10,7 +10,7 @@ from optparse import OptionParser
 def parse_args():
     """Parse CLI arguments"""
     usage = "usage: %prog database\n\n" +\
-            "Example: %prog ns_db "
+            "Example: %prog fast "
 
     parser = OptionParser(usage)
     options, args = parser.parse_args()
