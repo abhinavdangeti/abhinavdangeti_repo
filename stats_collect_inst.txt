@@ -84,4 +84,6 @@ RUNNING THE SETUP:
 - At any point / at the end of the test, with seriesly still running run compile_report against one of the databases (fast/slow), as:
 	python compile_report.py fast
 	python compile_report.py slow
+- API help for seriesly:
+	https://github.com/dustin/seriesly/wiki/api
 
