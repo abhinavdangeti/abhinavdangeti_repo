@@ -17,8 +17,8 @@ for proc in kill_procs:
     os.system("ps aux | grep %s | awk '{print $2}' | xargs kill" % proc)
 
 # cleaning up seriesly database (fast and slow created by cbtop)
-os.system("curl -X DELETE http://localhost:3133/fast")
-os.system("curl -X DELETE http://localhost:3133/slow")
+os.system("curl -X DELETE http://{0}:3133/fast".format(cfg.SERIESLY_IP))
+os.system("curl -X DELETE http://{0}:3133/slow".format(cfg.SERIESLY_IP))
 
 # start sdk server
 os.system("python sdkserver.py  &")
