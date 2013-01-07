@@ -1,0 +1,14 @@
+[2013-01-06 17:41:54,900] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.235:11210
+[2013-01-06 17:41:55,621] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.236:11210
+[2013-01-06 17:41:56,322] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.237:11210
+[2013-01-06 17:41:57,042] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.238:11210
+[2013-01-06 17:41:57,806] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.235:11210
+[2013-01-06 17:41:58,524] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.236:11210
+[2013-01-06 17:41:59,295] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.237:11210
+[2013-01-06 17:42:00,040] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.238:11210
+[2013-01-06 17:42:00,800] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.235:11210
+[2013-01-06 17:42:01,512] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.236:11210
+[2013-01-06 17:42:02,232] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.237:11210
+[2013-01-06 17:42:02,994] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.238:11210
+[2013-01-06 17:42:03,754] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.235:11210
+[2013-01-06 17:42:05,462] - [mc_source] [139940818097920] - ERROR - exception for key tapagg : Memcached error #1 'Not found':  Not found for vbucket :0 to mc 10.1.3.236:11210

@@ -1,0 +1,63 @@
+[
+    {
+        "model": "cbmonitor.cluster",
+        "pk": "East",
+        "fields": {
+            "description": "Virginia"
+        }
+    },
+    {
+        "model": "cbmonitor.server",
+        "pk": "ec2-54-242-160-13.compute-1.amazonaws.com",
+        "fields": {
+            "cluster": "East",
+            "description": "",
+            "rest_password": "password",
+            "rest_username": "Administrator",
+            "ssh_username": "root",
+            "ssh_password": "couchbase",
+            "ssh_key": ""
+        }
+    },
+    {
+        "model": "cbmonitor.bucket",
+        "pk": 1,
+        "fields": {
+            "name": "default",
+            "cluster": "East",
+            "type": "Couchbase",
+            "password": "",
+            "port": 11211
+        }
+    },
+    {
+        "model": "cbmonitor.metric",
+        "pk": null,
+        "fields": {
+            "name": "cache_miss",
+            "cluster": "East",
+            "server": "ec2-54-242-160-13.compute-1.amazonaws.com",
+            "bucket": 1
+        }
+    },
+    {
+        "model": "cbmonitor.metric",
+        "pk": null,
+        "fields": {
+            "name": "disk_queue",
+            "cluster": "East",
+            "server": null,
+            "bucket": 1
+        }
+    },
+    {
+        "model": "cbmonitor.event",
+        "pk": null,
+        "fields": {
+            "name": "Rebalance start",
+            "cluster": "East",
+            "server": "ec2-54-242-160-13.compute-1.amazonaws.com",
+            "bucket": 1
+        }
+    }
+]
