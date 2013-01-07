@@ -23,10 +23,6 @@ sudo apt-get update
 
 pip install pil
 
-For the report generation:
-pip install reportlab
-sudo apt-get install python-matplotlib
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Go:
 As per http://golang.org/doc/install ,
@@ -54,6 +50,12 @@ or more permenantly:
 
 edit ~/.bashrc
 append the export commands.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+For the report generation:
+pip install reportlab
+sudo apt-get install python-matplotlib
+pip install seriesly
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Get the cbmonitor package:
