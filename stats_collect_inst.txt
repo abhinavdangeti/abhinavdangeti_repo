@@ -70,8 +70,12 @@ REPORT GENERATION:
 	compile_report.py in testrunner/pysystests/
 	Run as: python compile_report.py [db_name]
 	db_name: fast / slow
+- Changed files:
+    /pysystests/:
 	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/compile_report.py
 	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/plotter.py
+    /pysystests/app/:
+	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/init.py
 
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 RUNNING THE SETUP:
