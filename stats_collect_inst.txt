@@ -56,6 +56,7 @@ For the report generation:
 pip install reportlab
 sudo apt-get install python-matplotlib
 pip install seriesly
+Any missing libraries can be installed as: pip install <library_name>
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Get the cbmonitor package:
