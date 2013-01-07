@@ -25,7 +25,7 @@ pip install pil
 
 For the report generation:
 pip install reportlab
-pip install matplotlib
+sudo apt-get install python-matplotlib
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Go:
