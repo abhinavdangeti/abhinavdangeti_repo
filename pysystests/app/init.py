@@ -12,9 +12,16 @@ os.system("rm -rf celerybeat-schedule.db")
 CacheHelper.cacheClean()
 
 # kill old background processes
-kill_procs=["sdkserver"]
+kill_procs=["sdkserver", "cbtop"]
 for proc in kill_procs:
     os.system("ps aux | grep %s | awk '{print $2}' | xargs kill" % proc)
 
+# cleaning up seriesly database (fast and slow created by cbtop)
+os.system("curl -X DELETE http://localhost:3133/fast")
+os.system("curl -X DELETE http://localhost:3133/slow")
+
 # start sdk server
 os.system("python sdkserver.py  &")
+
+# start cbtop (ensure seriesly is running)
+os.system("nohup ./cbtop -b {0} &".format(cfg.COUCHBASE_IP))
