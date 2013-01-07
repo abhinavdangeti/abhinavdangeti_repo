@@ -64,6 +64,7 @@ git clone https://github.com/couchbase/cbmonitor.git
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 MERGING CBMONITOR WITH PYSYSTESTS:
+- shortcut to new pysystests repo: https://github.com/duncanhong/pysystests
 - copy contents of cbmonitor into testrunner/pysystests/
 - Added/edited files:
     /pysystests/:
