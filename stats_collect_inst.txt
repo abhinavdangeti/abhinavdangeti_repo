@@ -58,11 +58,12 @@ git clone https://github.com/couchbase/cbmonitor.git
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 MERGING CBMONITOR WITH PYSYSTESTS:
 - copy contents of cbmonitor into testrunner/pysystests/
-- Edit app/init.py under pysystests
-	Add these lines, at the end:
-
-		# start cbtop (ensure seriesly is running)
-		os.system("nohup ./cbtop -b {0} &".format(cfg.COUCHBASE_IP))
+- Added/edited files:
+    /pysystests/:
+	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/compile_report.py
+	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/plotter.py
+    /pysystests/app/:
+	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/init.py
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 REPORT GENERATION:
@@ -70,12 +71,6 @@ REPORT GENERATION:
 	compile_report.py in testrunner/pysystests/
 	Run as: python compile_report.py [db_name]
 	db_name: fast / slow
-- Changed files:
-    /pysystests/:
-	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/compile_report.py
-	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/plotter.py
-    /pysystests/app/:
-	https://github.com/abhinavdangeti/abhinavdangeti_repo/blob/master/init.py
 
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 RUNNING THE SETUP:
