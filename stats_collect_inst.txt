@@ -81,7 +81,8 @@ RUNNING THE SETUP:
 - On one of the workers (the chosen) scheduler, start up seriesly (default port: 3133)
 - Run celery, (cbtop gets kicked off, runs in background, writes to seriesly)
 - Start up the work loads as before.
-- At any point / at the end of the test, with seriesly still running run compile_report against one of the databases (fast/slow), as:
+- At any point / at the end of the test, with seriesly still running run compile_report 
+  against one of the databases (fast/slow), as:
 	python compile_report.py fast
 	python compile_report.py slow
 - API help for seriesly:
