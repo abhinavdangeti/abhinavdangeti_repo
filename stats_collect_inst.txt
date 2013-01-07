@@ -23,6 +23,10 @@ sudo apt-get update
 
 pip install pil
 
+For the report generation:
+pip install reportlab
+pip install matplotlib
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Go:
 As per http://golang.org/doc/install ,
