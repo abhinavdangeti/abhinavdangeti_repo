@@ -237,6 +237,8 @@ public class Mainhelper {
 		thread1.join();
 		thread2.join();
 		
+        Thread.sleep(10000);
+
 		System.out.println("Running thread to delete: ");
 		Thread thread3 = new Thread(myRunnable3);
 		thread3.start();
