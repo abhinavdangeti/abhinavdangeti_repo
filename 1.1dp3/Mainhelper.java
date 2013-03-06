@@ -19,6 +19,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 public class Mainhelper {
  
 	 private static int NUM_ITEMS = 0;
+     private static int ITEM_SIZE = 0;
 	 private static int EXPIRATION = 0;
 	 private static double RATIO_EXP = 0;
 	 private static Boolean OBSERVE = false;
@@ -83,6 +84,8 @@ public class Mainhelper {
 				String key = (String) enuKeys.nextElement();
 				if(key.equals("item-count"))
 					NUM_ITEMS = Integer.parseInt(properties.getProperty(key));
+                else if(key.equals("item-size"))
+                    ITEM_SIZE = Integer.parseInt(properties.getProperty(key));
 				else if(key.equals("bucket-name"))
 					BUCKET_NAME = properties.getProperty(key);
 				else if(key.equals("bucket-password"))
@@ -128,7 +131,7 @@ public class Mainhelper {
 			public void run() {
 				System.out.println("Load a " + NUM_ITEMS + " items ..");
 				try {
-					set_latency = Loader.load_items(NUM_ITEMS, RATIO_EXP, EXPIRATION, OBSERVE);
+					set_latency = Loader.load_items(NUM_ITEMS, ITEM_SIZE, RATIO_EXP, EXPIRATION, OBSERVE);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
@@ -197,7 +200,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_replace_flag.equals("yes") || do_replace_flag.equals("1")){
 					try {
-						replace_latency = Replacer.replace_items(NUM_ITEMS, REPLACE_PERCENT, EXPIRATION, OBSERVE);
+						replace_latency = Replacer.replace_items(NUM_ITEMS, ITEM_SIZE, REPLACE_PERCENT, EXPIRATION, OBSERVE);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -214,7 +217,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_add_flag.equals("yes") || do_add_flag.equals("1")){
 					try {
-						add_latency = Adder.add_items(NUM_ITEMS, ADD_PERCENT, EXPIRATION, OBSERVE);
+						add_latency = Adder.add_items(NUM_ITEMS, ITEM_SIZE, ADD_PERCENT, EXPIRATION, OBSERVE);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -230,31 +233,31 @@ public class Mainhelper {
 		System.out.println("Running thread to set: ");
 		Thread thread1 = new Thread(myRunnable1);
 		thread1.start();
-		System.out.println("Running thread to get: ");
-		Thread thread2 = new Thread(myRunnable2);
-		thread2.start();
+		//System.out.println("Running thread to get: ");
+		//Thread thread2 = new Thread(myRunnable2);
+		//thread2.start();
 		
 		thread1.join();
-		thread2.join();
+		//thread2.join();
 		
-        Thread.sleep(10000);
+        Thread.sleep(20000);
 
 		System.out.println("Running thread to delete: ");
 		Thread thread3 = new Thread(myRunnable3);
 		thread3.start();
-		System.out.println("Running thread to replace: ");
-		Thread thread4 = new Thread(myRunnable4);
-		thread4.start();
-		System.out.println("Running thread to add: ");
-		Thread thread5 = new Thread(myRunnable5);
-		thread5.start();
+		//System.out.println("Running thread to replace: ");
+		//Thread thread4 = new Thread(myRunnable4);
+		//thread4.start();
+		//System.out.println("Running thread to add: ");
+		//Thread thread5 = new Thread(myRunnable5);
+		//thread5.start();
 		
 		thread3.join();
-		thread4.join();
-		thread5.join();
+		//thread4.join();
+		//thread5.join();
 		
-		System.out.println("Querying a view: ");
-		System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
+		//System.out.println("Querying a view: ");
+		//System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
 		
 		Thread.sleep(5000);
 		System.out.println("\n - - - - - - - - - - ");

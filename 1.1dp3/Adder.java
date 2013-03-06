@@ -20,7 +20,7 @@ public class Adder {
 	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
 	@SuppressWarnings("unused")
-	public static double add_items(int number_items, double ratio_add, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException, JSONException {
+	public static double add_items(int number_items, int item_size, double ratio_add, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException, JSONException {
 		double add_items = ratio_add * number_items;
 		CouchbaseClient client = Mainhelper.connect();
 		double tot_time = 0.0;
@@ -29,7 +29,7 @@ public class Adder {
 		for(int i=number_items;i<=number_items + (int)(add_items);i++){
 			String Key = String.format("Key-%d", i);
 			//String Value = String.format("%d", i);
-			JSONObject Value = Jsongen.retrieveJSON(i, generator);
+			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			try{
 				OperationFuture<Boolean> addOp = null;
 				if(OBSERVE){

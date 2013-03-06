@@ -18,7 +18,7 @@ public class Loader {
 	 * Enabling OBSERVE, makes the loader check if every item created has persisted or not.
 	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
-	public static double load_items(int number_items, double ratio_exp, int expiration, Boolean OBSERVE) 
+	public static double load_items(int number_items, int item_size, double ratio_exp, int expiration, Boolean OBSERVE) 
 			throws URISyntaxException, IOException, InterruptedException, ExecutionException, JSONException {
 		CouchbaseClient client = Mainhelper.connect();		
 		int items_with_exp = (int)(number_items * ratio_exp);
@@ -28,7 +28,7 @@ public class Loader {
 		for(int i=1;i<=(number_items - items_with_exp);i++){
 			String Key = String.format("Key-%d", i);
 			//String Value = String.format("%d", i);
-			JSONObject Value = Jsongen.retrieveJSON(i, generator);
+			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			if(OBSERVE){
 				long preOBS = System.nanoTime();
 				OperationFuture<Boolean> setOp = client.set(Key, 0, Value.toString(), PersistTo.MASTER);
@@ -50,7 +50,7 @@ public class Loader {
 		for(int i=(number_items - items_with_exp + 1);i<=number_items;i++){
 			String Key = String.format("Key-%d", i);
 			//String Value = String.format("%d", i);
-			JSONObject Value = Jsongen.retrieveJSON(i, generator);
+			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			if(OBSERVE){
 				long preOBS = System.nanoTime();
 				OperationFuture<Boolean> setOp = client.set(Key, 0, Value.toString(), PersistTo.MASTER);
