@@ -22,7 +22,7 @@ public class Deleter {
 		int count = 0;
 		double tot_time = 0.0;
 		int obs_true=0,obs_false=0;
-		for(int i=1;i<=(int)(del_items);i++){
+		for(int i=0;i<=(int)(del_items);i++){
 			try {
 				OperationFuture<Boolean> delOp = null;
 				if(OBSERVE){
