@@ -19,7 +19,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 public class Mainhelper {
  
 	 private static int NUM_ITEMS = 0;
-     private static int ITEM_SIZE = 0;
+     	 private static int ITEM_SIZE = 0;
 	 private static int EXPIRATION = 0;
 	 private static double RATIO_EXP = 0;
 	 private static Boolean OBSERVE = false;
