@@ -233,31 +233,31 @@ public class Mainhelper {
 		System.out.println("Running thread to set: ");
 		Thread thread1 = new Thread(myRunnable1);
 		thread1.start();
-		//System.out.println("Running thread to get: ");
-		//Thread thread2 = new Thread(myRunnable2);
-		//thread2.start();
+		System.out.println("Running thread to get: ");
+		Thread thread2 = new Thread(myRunnable2);
+		thread2.start();
 		
 		thread1.join();
-		//thread2.join();
+		thread2.join();
 		
-        Thread.sleep(20000);
+        	Thread.sleep(5000);
 
 		System.out.println("Running thread to delete: ");
 		Thread thread3 = new Thread(myRunnable3);
 		thread3.start();
-		//System.out.println("Running thread to replace: ");
-		//Thread thread4 = new Thread(myRunnable4);
-		//thread4.start();
-		//System.out.println("Running thread to add: ");
-		//Thread thread5 = new Thread(myRunnable5);
-		//thread5.start();
+		System.out.println("Running thread to replace: ");
+		Thread thread4 = new Thread(myRunnable4);
+		thread4.start();
+		System.out.println("Running thread to add: ");
+		Thread thread5 = new Thread(myRunnable5);
+		thread5.start();
 		
 		thread3.join();
-		//thread4.join();
-		//thread5.join();
+		thread4.join();
+		thread5.join();
 		
-		//System.out.println("Querying a view: ");
-		//System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
+		System.out.println("Querying a view: ");
+		System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
 		
 		Thread.sleep(5000);
 		System.out.println("\n - - - - - - - - - - ");
