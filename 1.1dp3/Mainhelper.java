@@ -33,6 +33,7 @@ public class Mainhelper {
 	 private static double REPLACE_PERCENT = 0.0;
 	 private static String do_add_flag = "No";
 	 private static double ADD_PERCENT = 0.0;
+	 private static String do_query_view = "No";
 	 private static String ddoc_name = "";
 	 private static String view_name = "";
 	 private static double set_latency = 0.0;
@@ -112,6 +113,8 @@ public class Mainhelper {
 					do_add_flag = properties.getProperty(key);
 				else if(key.equals("add-ratio"))
 					ADD_PERCENT = Float.parseFloat(properties.getProperty(key));
+				else if(key.equals("query-view"))
+					do_query_view = properties.getProperty(key);
 				else if(key.equals("ddoc-name"))
 					ddoc_name = properties.getProperty(key);
 				else if(key.equals("view-name"))
@@ -256,9 +259,11 @@ public class Mainhelper {
 		thread4.join();
 		thread5.join();
 		
-		System.out.println("Querying a view: ");
-		System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
-		
+		if (do_query_view.equals("yes") || do_query_view.equals("1")){
+			System.out.println("Querying a view: ");
+			System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
+		}
+
 		Thread.sleep(5000);
 		System.out.println("\n - - - - - - - - - - ");
 		System.out.println("LATENCY STATS :- ");
