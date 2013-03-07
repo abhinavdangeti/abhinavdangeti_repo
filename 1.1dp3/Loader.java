@@ -37,7 +37,7 @@ public class Loader {
 				else
 					obs_false++;
 				long postOBS = System.nanoTime();
-				System.out.println("SET-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
+				//System.out.println("SET-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 				tot_time += (double)(postOBS - preOBS) / 1000000.0;
 			}else{
 				OperationFuture<Boolean> setOp = client.set(Key, 0, Value.toString());

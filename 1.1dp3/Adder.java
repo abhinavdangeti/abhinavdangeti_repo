@@ -40,7 +40,7 @@ public class Adder {
 					else
 						obs_false++;
 					long postOBS = System.nanoTime();
-					System.out.println("ADD-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
+					//System.out.println("ADD-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 					tot_time +=  (double)(postOBS - preOBS) / 1000000.0;
 				}else{
 					addOp = client.add(Key, expiration, Value.toString());
