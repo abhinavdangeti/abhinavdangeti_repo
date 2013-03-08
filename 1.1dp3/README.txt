@@ -43,8 +43,8 @@ Instructions:
 
 - Compile / Run Instructions:
 	- Mainhelper:
-		make Mainhelper
-		make RunMainhelper
+		make Main
+		make RunMain
 	- ViewQuery:
 		make ViewQuery
 		make RunViewQuery
