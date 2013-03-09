@@ -14,7 +14,7 @@ test.properties:
 - items-to-add     	... no. of sets in phase2
 - append-count		... no. of times to append
 - append-ratio		... ratio of items set in phase1 to be appended
-- append-data-size  ... data appended every time in bytes
+- append-data-size  	... data appended every time in bytes
 
 To compile:
 make Loadrunner
