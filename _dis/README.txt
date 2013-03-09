@@ -20,4 +20,4 @@ To compile:
 make Loadrunner
 
 To run:
-makr RunLoadrunner
+make RunLoadrunner
