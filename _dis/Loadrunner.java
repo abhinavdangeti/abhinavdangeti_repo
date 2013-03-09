@@ -102,6 +102,7 @@ public class Loadrunner {
 		//Wait for sets thread to complete
 		try {
 			_setThread.join();
+			System.out.println("Sets' thread - Done");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -116,12 +117,15 @@ public class Loadrunner {
 
 		//Wait for appends and adds thread to complete, and then kill the gets thread
 		try {
-			_appendThread.join();
 			_addThread.join();
+			System.out.println("Adds' thread - Done");
+			_appendThread.join();
+			System.out.println("Appends' thread - Done");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		_getThread.interrupt();
+		System.out.println("Gets' thread - Killed");
 		client.shutdown();
 		System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
 		System.out.println("DONE");
