@@ -40,12 +40,14 @@ public class Loadrunner {
 			e.printStackTrace();
 		}
 
+		final CouchbaseClient client = connect();
+		
 		//SETs thread
 		Runnable _setRun = new Runnable() {
 			public void run() {
 				System.out.println("Sets' thread starting up .. (" + _itemCount + " items)");
 				try {
-					Creater.create_items(_itemCount, _itemSize, _json);
+					Creater.create_items(_itemCount, _itemSize, _json, client);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -57,7 +59,7 @@ public class Loadrunner {
 			public void run() {
 				System.out.println("Gets' thread starting up ..");
 				try {
-					Getter.get_em_all(_itemCount);
+					Getter.get_em_all(_itemCount, client);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -68,14 +70,6 @@ public class Loadrunner {
 		Runnable _appendRun = new Runnable() {
 			public void run() {
 				System.out.println("Appends' thread starting up ..");
-				CouchbaseClient client = null;
-				try {
-					client = Loadrunner.connect();
-				} catch (URISyntaxException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 				for (int i=0; i<_appendCount; i++){
 					try {
 						Appender.append_items(_itemCount, _appendRatio, _appendSize, _json, client);
@@ -83,7 +77,6 @@ public class Loadrunner {
 						e.printStackTrace();
 					}
 				}
-				client.shutdown();
 			}
 		};
 
@@ -92,7 +85,7 @@ public class Loadrunner {
 			public void run() {
 				System.out.println("Adds' thread starting up .. (" + _addMore + " items)");
 				try {
-					Adder.add_items(_itemCount, _itemSize, _addMore, _json);
+					Adder.add_items(_itemCount, _itemSize, _addMore, _json, client);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -129,6 +122,9 @@ public class Loadrunner {
 			e.printStackTrace();
 		}
 		_getThread.interrupt();
+		client.shutdown();
+		System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
+		System.out.println("DONE");
 		System.exit(0);
 
 	}

@@ -13,9 +13,8 @@ import com.couchbase.client.CouchbaseClient;
 
 public class Adder {
 
-	public static void add_items (int _itemCount, int _itemSize, int _addMore, boolean _json) 
+	public static void add_items (int _itemCount, int _itemSize, int _addMore, boolean _json, CouchbaseClient client) 
 			throws URISyntaxException, IOException, JSONException, InterruptedException, ExecutionException {
-		CouchbaseClient client = Loadrunner.connect();
 		Random gen = new Random (123456789);
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

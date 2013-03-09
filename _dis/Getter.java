@@ -6,8 +6,7 @@ import com.couchbase.client.CouchbaseClient;
 
 public class Getter {
 
-	public static void get_em_all (int _itemCount) throws URISyntaxException, IOException {
-		CouchbaseClient client = Loadrunner.connect();
+	public static void get_em_all (int _itemCount, CouchbaseClient client) throws URISyntaxException, IOException {
 		while (true) {
 			for (int i=0; i<_itemCount; i++) {
 				Object getObject = null;
