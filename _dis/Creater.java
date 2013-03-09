@@ -35,6 +35,5 @@ public class Creater {
 		    	continue;
 			}
 		}
-		client.shutdown();
 	}
 }
