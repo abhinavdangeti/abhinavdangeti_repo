@@ -18,7 +18,7 @@ public class Adder {
 		CouchbaseClient client = Loadrunner.connect();
 		Random gen = new Random (123456789);
 		StringBuffer value = new StringBuffer();
-		String CHAR_LIST = "ABCDEFGHIJ";//KLMNOPQRSTUVWXYZ";
+		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _itemSize) {
            value.append(CHAR_LIST);
         }
@@ -27,12 +27,12 @@ public class Adder {
 			String key = String.format("Key-%d", i);
 			if (_json) {
 				JSONObject _val = Spawner.retrieveJSON(gen, _itemSize);
-				addOp = client.add(key, 0, _val.toString());
+				addOp = client.set(key, 0, _val.toString());
 			} else {
-				addOp = client.add(key, 0, value.toString());
+				addOp = client.set(key, 0, value.toString());
 			}
 			if (addOp.get().booleanValue() == false) {
-				System.err.println("Add failed: " + addOp.getStatus().getMessage());
+				System.err.println("Add/Set failed: " + addOp.getStatus().getMessage());
 				continue;
 			}
 		}

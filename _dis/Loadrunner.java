@@ -22,7 +22,7 @@ public class Loadrunner {
 	private static double _appendRatio = 0.0;
 	private static int _appendSize = 0;
 	private static int _appendCount = 1;						//No. of times to append the selected list
-	private static int _addMore = 0;							//No. of items more to add to the created list
+	private static int _addMore = 0;							//No. of items more to add (through sets) to the created list
 	private static boolean _json = false;
 
 	public static void main(String args[]) throws URISyntaxException, IOException{
@@ -68,13 +68,22 @@ public class Loadrunner {
 		Runnable _appendRun = new Runnable() {
 			public void run() {
 				System.out.println("Appends' thread starting up ..");
+				CouchbaseClient client = null;
+				try {
+					client = Loadrunner.connect();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				for (int i=0; i<_appendCount; i++){
 					try {
-						Appender.append_items(_itemCount, _appendRatio, _appendSize, _json);
+						Appender.append_items(_itemCount, _appendRatio, _appendSize, _json, client);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
+				client.shutdown();
 			}
 		};
 
@@ -120,7 +129,7 @@ public class Loadrunner {
 			e.printStackTrace();
 		}
 		_getThread.interrupt();
-		System.exit(0);	
+		System.exit(0);
 
 	}
 

@@ -18,7 +18,7 @@ public class Creater {
 		CouchbaseClient client = Loadrunner.connect();
 		Random gen = new Random ( 987654321 );
 		StringBuffer value = new StringBuffer();
-		String CHAR_LIST = "ABCDEFGHIJ";//KLMNOPQRSTUVWXYZ";
+		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _itemSize) {
            value.append(CHAR_LIST);
         }
