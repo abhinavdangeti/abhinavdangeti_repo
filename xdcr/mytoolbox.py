@@ -2,6 +2,8 @@ from couchbase.documentgenerator import BlobGenerator, DocumentGenerator
 from membase.helper.rebalance_helper import RebalanceHelper
 from xdcrbasetests import XDCRReplicationBaseTest
 from remote.remote_util import RemoteMachineShellConnection
+from membase.api.rest_client import RestConnection
+from random import randrange
 
 import time
 
@@ -131,29 +133,53 @@ class test(XDCRReplicationBaseTest):
         else:
             print "cbrestore not executed"
 
-    def load_with_my_ops(self):
-        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
-        raw_input("LOAD COMPLETED ON SOURCE, press ENTER to continue..")
+    #Bidirectional replication only
+    def testing_conflicts(self):
+        rest1 = RestConnection(self.src_master)
+        rest1.remove_all_replications()
+        rest2 = RestConnection(self.dest_master)
+        rest2.remove_all_replications()
+        raw_input("Press Enter to continue ..")
+       
+        if "create" in self._doc_ops:
+            self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
+        if "create" in self._doc_ops_dest:
+            self._load_all_buckets(self.dest_master, self.gen_create2, "create", 0)
 
-#        tasks = []
-#        if self._doc_ops is not None:
-#            if "update" in self._doc_ops:
-#                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires))
-#            if "delete" in self._doc_ops:
-#                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_delete, "delete", 0))
-#        for task in tasks:
-#            task.result()
+        raw_input("Creation phase complete, press Enter to continue ..")
+        tasks = tasks1 = []
+        s_upd_count = randrange(0, 5)
+        for i in range(0, 3):
+            print "No. of times updated by source .. " + str(i+1) 
+            if "update" in self._doc_ops:
+                tasks1 += self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires)
+        for task in tasks1:
+            task.result()
+        if "update" in self._doc_ops and "update" in self._doc_ops_dest:
+            self.sleep(30)
+        raw_input("Initial update phase by source complete, press Enter to continue and set up the replications ..")
+        self._replicate_clusters(self.src_master, self._cluster_names_dic[self._clusters_keys_olst[1]])
+        self._replicate_clusters(self.dest_master, self._cluster_names_dic[self._clusters_keys_olst[0]])
+        raw_input("Are the replications set up?, press Enter to continue with waiting for replications to catch up ..")
+        self.sleep(self._timeout * 2)
+        raw_input("Press Enter to continue with updates from destination ..")
+        d_upd_count = randrange(0, 3)
+        for i in range(0, 3):
+            print "No. of times updated by destination .. " + str(i+1)
+            if "update" in self._doc_ops_dest:
+                tasks += self._async_load_all_buckets(self.dest_master, self.gen_update, "update", self._expires)
+        raw_input("Press Enter to have the final update from the source ..")
+        tasks += self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires)
+        
+        if "delete" in self._doc_ops:
+            tasks += self._async_load_all_buckets(self.src_master, self.gen_delete, "delete", 0)
+        if "delete" in self._doc_ops_dest:
+            tasks += self._async_load_all_buckets(self.dest_master, self.gen_delete2, "delete", 0)
 
-        time.sleep(self._timeout / 6)
-        self.verify_results(verify_src=True)
+        for task in tasks:
+            task.result()
 
-    def special_test(self):
-        for server in self._servers:
-            shell = RemoteMachineShellConnection(server)
-            shell.set_environment_variable('XDCR_CAPI_CHECKPOINT_TIMEOUT', 10)
-            
-        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
-        raw_input("LOAD COMPLETED ON SOURCE, press ENTER to continue..")
+        raw_input("Press Enter to begin merging keys on KVStore and then verify .. ")
+        self.merge_buckets(self.src_master, self.dest_master, bidirection=True)
 
-        time.sleep(self._timeout / 6)
         self.verify_results(verify_src=True)
