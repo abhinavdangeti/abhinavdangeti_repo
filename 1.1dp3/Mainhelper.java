@@ -262,7 +262,7 @@ public class Mainhelper {
 		
 		if (do_query_view.equals("yes") || do_query_view.equals("1")){
 			System.out.println("Querying a view: ");
-			System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port));
+			System.out.println("Result of load is " + Viewer.loadQuery(ddoc_name, view_name, serverAddr, port, client));
 		}
 
 		Thread.sleep(5000);
@@ -275,6 +275,6 @@ public class Mainhelper {
 		System.out.println("REPLACES: " + replace_latency + "ms.");
 		System.out.println(" - - - - - - - - - - ");
 		
-		System.exit(0);
+		//System.exit(0);
 	}
 }
