@@ -21,7 +21,7 @@ public class Loadrunner {
 	private static int _itemSize = 0;							//In bytes
 	private static double _appendRatio = 0.0;
 	private static int _appendSize = 0;
-	private static int _appendCount = 1;						//No. of times to append the selected list
+	private static int _appendCount = 1;							//No. of times to append the selected list
 	private static int _addMore = 0;							//No. of items more to add (through sets) to the created list
 	private static boolean _json = false;
 
@@ -129,7 +129,7 @@ public class Loadrunner {
 		client.shutdown();
 		System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
 		System.out.println("DONE");
-		System.exit(0);
+		//System.exit(0);
 
 	}
 
