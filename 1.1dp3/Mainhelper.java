@@ -129,12 +129,14 @@ public class Mainhelper {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		 
+	
+		CouchbaseClient client = connect();
+
 		Runnable myRunnable1 = new Runnable() {
 			public void run() {
 				System.out.println("Load a " + NUM_ITEMS + " items ..");
 				try {
-					set_latency = Loader.load_items(NUM_ITEMS, ITEM_SIZE, RATIO_EXP, EXPIRATION, OBSERVE);
+					set_latency = Loader.load_items(NUM_ITEMS, ITEM_SIZE, RATIO_EXP, EXPIRATION, OBSERVE, client);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
@@ -153,7 +155,6 @@ public class Mainhelper {
 		Runnable myRunnable2 = new Runnable() {		
 			public void run() {
 				try {
-					CouchbaseClient client = connect();
 					while(true){
 						int count = 0;
 						for(int i=1;i<=NUM_ITEMS;i++){
@@ -189,7 +190,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_delete_flag.equals("yes") || do_delete_flag.equals("1")) {
 					try {
-						delete_latency = Deleter.delete_items(NUM_ITEMS, DEL_PERCENT, OBSERVE);
+						delete_latency = Deleter.delete_items(NUM_ITEMS, DEL_PERCENT, OBSERVE, client);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -203,7 +204,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_replace_flag.equals("yes") || do_replace_flag.equals("1")){
 					try {
-						replace_latency = Replacer.replace_items(NUM_ITEMS, ITEM_SIZE, REPLACE_PERCENT, EXPIRATION, OBSERVE);
+						replace_latency = Replacer.replace_items(NUM_ITEMS, ITEM_SIZE, REPLACE_PERCENT, EXPIRATION, OBSERVE, client);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -220,7 +221,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_add_flag.equals("yes") || do_add_flag.equals("1")){
 					try {
-						add_latency = Adder.add_items(NUM_ITEMS, ITEM_SIZE, ADD_PERCENT, EXPIRATION, OBSERVE);
+						add_latency = Adder.add_items(NUM_ITEMS, ITEM_SIZE, ADD_PERCENT, EXPIRATION, OBSERVE, client);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -265,6 +266,7 @@ public class Mainhelper {
 		}
 
 		Thread.sleep(5000);
+		client.shutdown();
 		System.out.println("\n - - - - - - - - - - ");
 		System.out.println("LATENCY STATS :- ");
 		System.out.println("SETS: " + set_latency + "ms.");
