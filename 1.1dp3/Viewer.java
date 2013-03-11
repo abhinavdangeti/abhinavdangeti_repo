@@ -19,13 +19,12 @@ public class Viewer {
 	/*
 	 * Querys an already created view.
 	 */
-	public static boolean loadQuery(String ddocname, String viewname, String serverAddr, String port) 
+	public static boolean loadQuery(String ddocname, String viewname, String serverAddr, String port, CouchbaseClient client) 
 			throws URISyntaxException, IOException, InterruptedException, ExecutionException {
 	
 		String SERVER_URI = "http://" + serverAddr + ":" + port + "/pools";
 		List<URI> uris = new LinkedList<URI>();
 		uris.add(URI.create(SERVER_URI));
-		CouchbaseClient client = Mainhelper.connect();
 		
 		View view = client.getView(ddocname, viewname);
 		if (view == null){
