@@ -2,10 +2,10 @@ Sets / Gets / Appends
 
 Edit test.properties for run-spec and cluster details
 
-- Gets run through-out
+- Gets run throughout
 - Sets run as part of phase1
 - Additional sets and appends follow as part of phase2
-- Tests run until conditions specified in test.properties are satisfied
+- Test runs until conditions specified in test.properties are satisfied
 
 test.properties:
 - json:false   		... Doesn't generate JSON documents
