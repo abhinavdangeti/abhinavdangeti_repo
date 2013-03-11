@@ -20,9 +20,9 @@ public class Adder {
 	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
 	@SuppressWarnings("unused")
-	public static double add_items(int number_items, int item_size, double ratio_add, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException, JSONException {
+	public static double add_items(int number_items, int item_size, double ratio_add, int expiration, Boolean OBSERVE, CouchbaseClient client) 
+					throws URISyntaxException, IOException, JSONException {
 		double add_items = ratio_add * number_items;
-		CouchbaseClient client = Mainhelper.connect();
 		double tot_time = 0.0;
 		int obs_true=0, obs_false=0;
 		Random generator = new Random( 123456789 );
