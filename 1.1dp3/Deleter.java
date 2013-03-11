@@ -16,9 +16,9 @@ public class Deleter {
 	 * Items are deleted based on the key.
 	 */
 	@SuppressWarnings("unused")
-	public static double delete_items(int number_items, double ratio_delete, Boolean OBSERVE) throws URISyntaxException, IOException {
+	public static double delete_items(int number_items, double ratio_delete, Boolean OBSERVE, CouchbaseClient client)
+					throws URISyntaxException, IOException {
 		double del_items = ratio_delete * number_items;
-		CouchbaseClient client = Mainhelper.connect();
 		int count = 0;
 		double tot_time = 0.0;
 		int obs_true=0,obs_false=0;
