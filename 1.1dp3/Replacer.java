@@ -20,9 +20,9 @@ public class Replacer {
 	 * Replaced items have key [Key-i] and corresponding json document [new-i].
 	 */
 	@SuppressWarnings("unused")
-	public static double replace_items(int number_items, int item_size, double ratio_replace, int expiration, Boolean OBSERVE) throws URISyntaxException, IOException, JSONException {
+	public static double replace_items(int number_items, int item_size, double ratio_replace, int expiration, Boolean OBSERVE, CouchbaseClient client) 
+					throws URISyntaxException, IOException, JSONException {
 		double rep_items = ratio_replace * number_items;
-		CouchbaseClient client = Mainhelper.connect();
 		double tot_time = 0.0;
 		int obs_true=0,obs_false=0;
 		Random generator = new Random( 987654321 );
