@@ -18,9 +18,8 @@ public class Loader {
 	 * Enabling OBSERVE, makes the loader check if every item created has persisted or not.
 	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
-	public static double load_items(int number_items, int item_size, double ratio_exp, int expiration, Boolean OBSERVE) 
-			throws URISyntaxException, IOException, InterruptedException, ExecutionException, JSONException {
-		CouchbaseClient client = Mainhelper.connect();		
+	public static double load_items(int number_items, int item_size, double ratio_exp, int expiration, Boolean OBSERVE, CouchbaseClient client) 
+			throws URISyntaxException, IOException, InterruptedException, ExecutionException, JSONException {	
 		int items_with_exp = (int)(number_items * ratio_exp);
 		double tot_time = 0.0;
 		int obs_true=0, obs_false=0;
