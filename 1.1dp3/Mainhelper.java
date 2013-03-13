@@ -275,6 +275,6 @@ public class Mainhelper {
 		System.out.println("REPLACES: " + replace_latency + "ms.");
 		System.out.println(" - - - - - - - - - - ");
 		
-		//System.exit(0);
+		System.exit(0);
 	}
 }
