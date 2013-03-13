@@ -129,7 +129,7 @@ public class Loadrunner {
 		client.shutdown();
 		System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
 		System.out.println("DONE");
-		//System.exit(0);
+		System.exit(0);
 
 	}
 
