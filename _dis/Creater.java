@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -21,19 +23,29 @@ public class Creater {
         while (value.length() < _itemSize) {
            value.append(CHAR_LIST);
         }
-        OperationFuture<Boolean> setOp = null;
+        
+        List<OperationFuture<Boolean>> creates = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=0; i<_itemCount; i++){
+			OperationFuture<Boolean> setOp;
 			String key = String.format("Key-%d", i);
 			if (_json) {
 				JSONObject _val = Spawner.retrieveJSON(gen, _itemSize);
 				setOp = client.set(key, 0, _val.toString());
 			} else {
 				setOp = client.set(key, 0, value.toString());
+				creates.add(setOp);
 			}
 			if (setOp.get().booleanValue() == false){ 
-				System.err.println("Set failed: " + setOp.getStatus().getMessage());
+				
 		    	continue;
 			}
+		}
+		while (!creates.isEmpty()) {
+			if (creates.get(0).get().booleanValue() == false){
+				System.err.println("Set failed: "/* + setOp.getStatus().getMessage()*/);
+				continue;
+			}
+			creates.remove(0);
 		}
 	}
 }
