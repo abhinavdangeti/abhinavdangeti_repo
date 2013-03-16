@@ -92,7 +92,7 @@ public class Mixer {
 		Runnable _exp_ = new Runnable() {
 			public void run() {
 				try {
-					expire_post(_expiration_time, dclient);
+					expire_post(_initial_load + _post_load - (6*_x_), _initial_load + _post_load - (5*_x_), _expiration_time, dclient);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -148,15 +148,27 @@ public class Mixer {
 		System.out.println("Starting updater thread ..");
 		updater.start();
 		updater.join();
+		System.out.println("Updater terminated!");
 		deleter.join();
+		System.out.println("Deleter terminated!");
 		expirer.join();
+		System.out.println("Expirer terminated!");
         
-		System.out.println("Run expiry pager on the servers for default bucket manually, then enter in something to continue ..");
+		System.out.println("Initial expiring of 100K items completed already, now expiring 90% of initial load ..");
+		
+		expire_post(0, _initial_load, _expiration_time, dclient);
+		
+		System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER >-- \n");
 		sc = new Scanner(System.in);
 		@SuppressWarnings("unused")
 		String _ok_2 = sc.nextLine();
         
 		System.out.println("--< COMPLETED STAGE 2 >--");
+        
+		System.out.println("Press enter to quit the _bg_ thread and terminate ..");
+		sc = new Scanner(System.in);
+		@SuppressWarnings("unused")
+		String _ok_3 = sc.nextLine();
         
 		bg_setget_er.interrupt();
 		dclient.shutdown();
@@ -245,14 +257,14 @@ public class Mixer {
         //		}
 	}
     
-	protected static void expire_post(int expiration, CouchbaseClient dclient) throws InterruptedException, ExecutionException {
+	protected static void expire_post(int start, int end, int expiration, CouchbaseClient dclient) throws InterruptedException, ExecutionException {
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
             value.append(CHAR_LIST);
         }
         //        List<OperationFuture<Boolean>> expires = new LinkedList<OperationFuture<Boolean>>();
-		for (int i=_initial_load + _post_load - (6*_x_); i<_initial_load + _post_load - (5*_x_); i++){
+		for (int i=start; i<end; i++){
 			String key = String.format("%s%d", _prefix, i);
 			OperationFuture<Boolean> expOp = dclient.replace(key, expiration, value.toString());
             //			expires.add(expOp);
