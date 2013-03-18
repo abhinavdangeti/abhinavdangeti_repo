@@ -135,6 +135,12 @@ public class Mixer {
 		//Load till higher watermark
 		load_post(_initial_load, _initial_load + _post_load, _item_size, dclient);
 		Thread.sleep(5000);
+		
+		System.out.println("\n Check mem_used on DEFAULT, data should be loaded till high water mark, press ENTER to proceed .. \n");
+		sc = new Scanner(System.in);
+		@SuppressWarnings("unused")
+		String _ok_2 = sc.nextLine();
+        
 		//background load on standard_bucket1,2
 		Thread bg_setget_er = new Thread(_bg_);
 		bg_setget_er.start();
@@ -165,7 +171,7 @@ public class Mixer {
 			System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER (RUN " + k+1 + ") >-- \n");
 			sc = new Scanner(System.in);
 			@SuppressWarnings("unused")
-			String _ok_2 = sc.nextLine();
+			String _ok_3 = sc.nextLine();
 			
 			Thread.sleep(3000);
 			load_initial(_initial_load, _item_size, dclient);
@@ -178,7 +184,7 @@ public class Mixer {
 		System.out.println("Press enter to quit the _bg_ thread and terminate ..");
 		sc = new Scanner(System.in);
 		@SuppressWarnings("unused")
-		String _ok_3 = sc.nextLine();
+		String _ok_4 = sc.nextLine();
         
 		bg_setget_er.interrupt();
 		dclient.shutdown();
