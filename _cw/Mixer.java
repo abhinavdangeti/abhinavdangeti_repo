@@ -24,18 +24,18 @@ public class Mixer {
 	private static int del_multiplier = 3;
 	
 	static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
-        List<URI> uris = new LinkedList<URI>();
-        uris.add(URI.create(String.format("http://" + _serverAddr + ":" + Integer.toString(_port) + "/pools")));
-        CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
-        try {
+	     List<URI> uris = new LinkedList<URI>();
+	     uris.add(URI.create(String.format("http://" + _serverAddr + ":" + Integer.toString(_port) + "/pools")));
+	     CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
+	     try {
 	     	return new CouchbaseClient(cfb.buildCouchbaseConnection(uris, _bucketName, _bucketPwd));
-        } catch (Exception e) {
+	     } catch (Exception e) {
 	     	System.err.println("Error connecting to Couchbase: "
-                               + e.getMessage());
+	        	+ e.getMessage());
 	      	System.exit(0);
-        }
-        return null;	    
-    }
+	     }
+	     return null;	    
+	 }
 	
 	public static void main(String args[]) throws URISyntaxException, IOException, InterruptedException, ExecutionException{
 		
@@ -52,18 +52,18 @@ public class Mixer {
 			load_initial(_initial_load, _item_size, client);
 			client.shutdown();
 		}
-        
+
 		CouchbaseClient mclient = connect(memcached_bucket, "");
 		load_initial(_initial_load, _item_size, mclient);
 		mclient.shutdown();
-        
+
 		System.out.println("--< COMPLETED STAGE 1 >--");
-        
+
 		System.out.println("Enter something to start work on default bucket");
 		Scanner sc = new Scanner(System.in);
 		@SuppressWarnings("unused")
 		String _ok_1 = sc.nextLine();
-        
+
 		Runnable _bg_ = new Runnable() {
 			public void run() {
 				try {
@@ -83,13 +83,13 @@ public class Mixer {
 				}
 			}
 		};
-        
+
 		/*
 		 * CHOOSING DEFAULT BUCKET
 		 */
-        
+
 		final CouchbaseClient dclient = connect("default", "");
-        
+
 		Runnable _exp_ = new Runnable() {
 			public void run() {
 				try {
@@ -140,7 +140,7 @@ public class Mixer {
 		sc = new Scanner(System.in);
 		@SuppressWarnings("unused")
 		String _ok_2 = sc.nextLine();
-        
+
 		//background load on standard_bucket1,2
 		Thread bg_setget_er = new Thread(_bg_);
 		bg_setget_er.start();
@@ -163,7 +163,7 @@ public class Mixer {
 			System.out.println("Deleter terminated!");
 			expirer.join();
 			System.out.println("Expirer terminated!");
-            
+
 			System.out.println("Initial expiring of 100K items completed already, now expiring 90% of initial load ..");
 			
 			expire_post(0, _initial_load, _expiration_time, dclient);
@@ -174,46 +174,46 @@ public class Mixer {
 			String _ok_3 = sc.nextLine();
 			
 			Thread.sleep(3000);
-			load_initial(_initial_load, _item_size, dclient);
+			load_post(0, _initial_load + _post_load, _item_size, dclient);
 			Thread.sleep(10000);
 		}
 		//expire, delete, update items
-        
+
 		System.out.println("--< COMPLETED STAGE 2 >--");
-        
+
 		System.out.println("Press enter to quit the _bg_ thread and terminate ..");
 		sc = new Scanner(System.in);
 		@SuppressWarnings("unused")
 		String _ok_4 = sc.nextLine();
-        
+
 		bg_setget_er.interrupt();
 		dclient.shutdown();
 		System.exit(0);
 	}
-    
+
 	protected static void theother() throws InterruptedException, ExecutionException, URISyntaxException, IOException {
 		CouchbaseClient client1 = connect("standard_bucket2", "");
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
-            value.append(CHAR_LIST);
+           value.append(CHAR_LIST);
         }
-        //        List<OperationFuture<Boolean>> sets = new LinkedList<OperationFuture<Boolean>>();
+//        List<OperationFuture<Boolean>> sets = new LinkedList<OperationFuture<Boolean>>();
         for (int i=3 * _initial_load / 4; i<5 * _initial_load / 4; i++){
         	String key = String.format("%s%d", _prefix, i);
         	OperationFuture<Boolean> setOp = client1.set(key, 0, value.toString());
-            //        	sets.add(setOp);
+//        	sets.add(setOp);
         	if (setOp.get().booleanValue() == false){
 				continue;
 			}
         }
-        //		while (!sets.isEmpty()) {
-        //			if (sets.get(0).get().booleanValue() == false){
-        //				System.err.println("Update failed: "/* + setOp.getStatus().getMessage()*/);
-        //				continue;
-        //			} else 
-        //				sets.remove(0);
-        //		}
+//		while (!sets.isEmpty()) {
+//			if (sets.get(0).get().booleanValue() == false){
+//				System.err.println("Update failed: "/* + setOp.getStatus().getMessage()*/);
+//				continue;
+//			} else 
+//				sets.remove(0);
+//		}
 		client1.shutdown();
 		
 		CouchbaseClient client2 = connect("standard_bucket1", "");
@@ -230,81 +230,81 @@ public class Mixer {
 			}
 		}
 	}
-    
+
 	protected static void update_post(CouchbaseClient dclient) throws InterruptedException, ExecutionException {
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
-            value.append(CHAR_LIST);
+           value.append(CHAR_LIST);
         }
-        //        List<OperationFuture<Boolean>> updates = new LinkedList<OperationFuture<Boolean>>();
+//        List<OperationFuture<Boolean>> updates = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=_initial_load + _post_load - _x_; i<_initial_load + _post_load; i++){
 			String key = String.format("%s%d", _prefix, i);
 			OperationFuture<Boolean> repOp = dclient.replace(key, 0, value.toString());
-            //			updates.add(repOp);
+//			updates.add(repOp);
 			if (repOp.get().booleanValue() == false){
 				continue;
 			}
 		}
-        //		while (!updates.isEmpty()) {
-        //			if (updates.get(0).get().booleanValue() == false){
-        //				System.err.println("Update failed: "/* + repOp.getStatus().getMessage()*/);
-        //				continue;
-        //			} else
-        //				updates.remove(0);
-        //		}
+//		while (!updates.isEmpty()) {
+//			if (updates.get(0).get().booleanValue() == false){
+//				System.err.println("Update failed: "/* + repOp.getStatus().getMessage()*/);
+//				continue;
+//			} else
+//				updates.remove(0);
+//		}
 	}
-    
+
 	protected static void delete_post(CouchbaseClient dclient) throws InterruptedException, ExecutionException {
-        //		List<OperationFuture<Boolean>> deletes = new LinkedList<OperationFuture<Boolean>>();
+//		List<OperationFuture<Boolean>> deletes = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=_initial_load + _post_load - (5*_x_); i<_initial_load + _post_load - _x_; i++){
 			OperationFuture<Boolean> delOp = dclient.delete(String.format("%s%d", _prefix, i));
-            //			deletes.add(delOp);
+//			deletes.add(delOp);
 			if (delOp.get().booleanValue() == true){
 				continue;
 			}
 		}
-        //		while (!deletes.isEmpty()) {
-        //			if (deletes.get(0).get().booleanValue() == true){
-        //				System.err.println("Delete failed: "/* + delOp.getStatus().getMessage()*/);
-        //				continue;
-        //			} else
-        //				deletes.remove(0);
-        //		}
+//		while (!deletes.isEmpty()) {
+//			if (deletes.get(0).get().booleanValue() == true){
+//				System.err.println("Delete failed: "/* + delOp.getStatus().getMessage()*/);
+//				continue;
+//			} else
+//				deletes.remove(0);
+//		}
 	}
-    
+
 	protected static void expire_post(int start, int end, int expiration, CouchbaseClient dclient) throws InterruptedException, ExecutionException {
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
-            value.append(CHAR_LIST);
+           value.append(CHAR_LIST);
         }
-        //        List<OperationFuture<Boolean>> expires = new LinkedList<OperationFuture<Boolean>>();
+//        List<OperationFuture<Boolean>> expires = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=start; i<end; i++){
 			String key = String.format("%s%d", _prefix, i);
 			OperationFuture<Boolean> expOp = dclient.replace(key, expiration, value.toString());
-            //			expires.add(expOp);
+//			expires.add(expOp);
 			if (expOp.get().booleanValue() == false){
 				continue;
 			}
 		}
-        //		while (!expires.isEmpty()) {
-        //			if (expires.get(0).get().booleanValue() == false){
-        //				System.err.println("Update failed: "/* + expOp.getStatus().getMessage()*/);
-        //				continue;
-        //			} else
-        //				expires.remove(0);
-        //		}
+//		while (!expires.isEmpty()) {
+//			if (expires.get(0).get().booleanValue() == false){
+//				System.err.println("Update failed: "/* + expOp.getStatus().getMessage()*/);
+//				continue;
+//			} else
+//				expires.remove(0);
+//		}
 		
 	}
-    
+
 	private static void load_post(int start, int end, int _itemSize, CouchbaseClient client) throws InterruptedException, ExecutionException {
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _itemSize) {
-            value.append(CHAR_LIST);
+           value.append(CHAR_LIST);
         }
-        //        List<OperationFuture<Boolean>> creates = new LinkedList<OperationFuture<Boolean>>();
+//        List<OperationFuture<Boolean>> creates = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=start; i<end; i++){
 			OperationFuture<Boolean> setOp;
 			String key = String.format("%s%d", _prefix, i);
@@ -312,25 +312,25 @@ public class Mixer {
 			if (setOp.get().booleanValue() == false){
 				continue;
 			}
-            //			creates.add(setOp);
+//			creates.add(setOp);
 		}
-        //		while (!creates.isEmpty()) {
-        //			if (creates.get(0).get().booleanValue() == false){
-        //				System.err.println("Set failed: "/* + setOp.getStatus().getMessage()*/);
-        //				continue;
-        //			} else
-        //				creates.remove(0);
-        //		}
+//		while (!creates.isEmpty()) {
+//			if (creates.get(0).get().booleanValue() == false){
+//				System.err.println("Set failed: "/* + setOp.getStatus().getMessage()*/);
+//				continue;
+//			} else
+//				creates.remove(0);
+//		}
 		
 	}
-    
+
 	private static void load_initial(int _itemCount, int _itemSize, CouchbaseClient client) throws InterruptedException, ExecutionException {
 		StringBuffer value = new StringBuffer();
 		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _itemSize) {
-            value.append(CHAR_LIST);
+           value.append(CHAR_LIST);
         }
-        //        List<OperationFuture<Boolean>> creates = new LinkedList<OperationFuture<Boolean>>();
+//        List<OperationFuture<Boolean>> creates = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=0; i<_itemCount; i++){
 			OperationFuture<Boolean> setOp;
 			String key = String.format("%s%d", _prefix, i);
@@ -338,15 +338,15 @@ public class Mixer {
 			if (setOp.get().booleanValue() == false){
 				continue;
 			}
-            //			creates.add(setOp);
+//			creates.add(setOp);
 		}
-        //		while (!creates.isEmpty()) {
-        //			if (creates.get(0).get().booleanValue() == false){
-        //				System.err.println("Set failed: "/* + setOp.getStatus().getMessage()*/);
-        //				continue;
-        //			} else
-        //				creates.remove(0);
-        //		}
+//		while (!creates.isEmpty()) {
+//			if (creates.get(0).get().booleanValue() == false){
+//				System.err.println("Set failed: "/* + setOp.getStatus().getMessage()*/);
+//				continue;
+//			} else
+//				creates.remove(0);
+//		}
 		
 	}
 }
