@@ -20,7 +20,7 @@ public class Mixer {
 	private static int _x_ = 100000;
 	private static String _prefix = "key";
 	private static int _item_size = 512;
-	private static int _expiration_time = 1800;
+	private static int _expiration_time = 900;
 	private static int del_multiplier = 3;
 	
 	static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
@@ -145,12 +145,11 @@ public class Mixer {
 		Thread bg_setget_er = new Thread(_bg_);
 		bg_setget_er.start();
 		
-		Thread expirer = new Thread(_exp_);
-		Thread deleter = new Thread(_del_);
-		Thread updater = new Thread(_upd_);
-		
 		for (int k=0; k<del_multiplier; k++) {
 			
+			Thread expirer = new Thread(_exp_);
+			Thread deleter = new Thread(_del_);
+			Thread updater = new Thread(_upd_);
 			System.out.println("Starting expirer thread ..");
 			expirer.start();
 			System.out.println("Starting deleter thread ..");
