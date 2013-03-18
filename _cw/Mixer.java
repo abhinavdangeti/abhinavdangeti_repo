@@ -21,6 +21,7 @@ public class Mixer {
 	private static String _prefix = "key";
 	private static int _item_size = 512;
 	private static int _expiration_time = 1800;
+	private static int del_multiplier = 3;
 	
 	static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
         List<URI> uris = new LinkedList<URI>();
@@ -137,31 +138,40 @@ public class Mixer {
 		//background load on standard_bucket1,2
 		Thread bg_setget_er = new Thread(_bg_);
 		bg_setget_er.start();
-		//expire, delete, update items
+		
 		Thread expirer = new Thread(_exp_);
 		Thread deleter = new Thread(_del_);
 		Thread updater = new Thread(_upd_);
-		System.out.println("Starting expirer thread ..");
-		expirer.start();
-		System.out.println("Starting deleter thread ..");
-		deleter.start();
-		System.out.println("Starting updater thread ..");
-		updater.start();
-		updater.join();
-		System.out.println("Updater terminated!");
-		deleter.join();
-		System.out.println("Deleter terminated!");
-		expirer.join();
-		System.out.println("Expirer terminated!");
-        
-		System.out.println("Initial expiring of 100K items completed already, now expiring 90% of initial load ..");
 		
-		expire_post(0, _initial_load, _expiration_time, dclient);
-		
-		System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER >-- \n");
-		sc = new Scanner(System.in);
-		@SuppressWarnings("unused")
-		String _ok_2 = sc.nextLine();
+		for (int k=0; k<del_multiplier; k++) {
+			
+			System.out.println("Starting expirer thread ..");
+			expirer.start();
+			System.out.println("Starting deleter thread ..");
+			deleter.start();
+			System.out.println("Starting updater thread ..");
+			updater.start();
+			updater.join();
+			System.out.println("Updater terminated!");
+			deleter.join();
+			System.out.println("Deleter terminated!");
+			expirer.join();
+			System.out.println("Expirer terminated!");
+            
+			System.out.println("Initial expiring of 100K items completed already, now expiring 90% of initial load ..");
+			
+			expire_post(0, _initial_load, _expiration_time, dclient);
+			
+			System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER (RUN " + k+1 + ") >-- \n");
+			sc = new Scanner(System.in);
+			@SuppressWarnings("unused")
+			String _ok_2 = sc.nextLine();
+			
+			Thread.sleep(3000);
+			load_initial(_initial_load, _item_size, dclient);
+			Thread.sleep(10000);
+		}
+		//expire, delete, update items
         
 		System.out.println("--< COMPLETED STAGE 2 >--");
         
