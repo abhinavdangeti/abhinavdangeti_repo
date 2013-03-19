@@ -13,14 +13,14 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 
 public class Mixer {
-	private static String _serverAddr = "10.3.2.49";
+	private static String _serverAddr = "10.xx.xx.xxx";
 	private static int _port = 8091;
 	private static int _initial_load = 1000000;
-	private static int _post_load = 800000;
+	private static int _post_load = 1000000;
 	private static int _x_ = 100000;
 	private static String _prefix = "key";
 	private static int _item_size = 512;
-	private static int _expiration_time = 1800;
+	private static int _expiration_time = 900;		//15 minutes
 	private static int del_multiplier = 3;
 	
 	static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
