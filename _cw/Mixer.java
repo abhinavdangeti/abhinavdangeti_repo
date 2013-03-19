@@ -20,7 +20,7 @@ public class Mixer {
 	private static int _x_ = 100000;
 	private static String _prefix = "key";
 	private static int _item_size = 512;
-	private static int _expiration_time = 900;
+	private static int _expiration_time = 1800;
 	private static int del_multiplier = 3;
 	
 	static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
@@ -167,7 +167,7 @@ public class Mixer {
 			
 			expire_post(0, _initial_load, _expiration_time, dclient);
 			
-			System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER (RUN " + k+1 + ") >-- \n");
+			System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER (RUN " + (k++) + ") >-- \n");
 			sc = new Scanner(System.in);
 			@SuppressWarnings("unused")
 			String _ok_3 = sc.nextLine();
