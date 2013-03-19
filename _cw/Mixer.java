@@ -171,7 +171,8 @@ public class Mixer {
 			sc = new Scanner(System.in);
 			@SuppressWarnings("unused")
 			String _ok_3 = sc.nextLine();
-			
+
+			System.out.println("Restarting the initial-post load ..");
 			Thread.sleep(3000);
 			load_post(0, _initial_load + _post_load, _item_size, dclient);
 			Thread.sleep(10000);
