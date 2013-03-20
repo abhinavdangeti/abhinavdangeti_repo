@@ -132,7 +132,7 @@ public class Mixer {
 			}
 		};
 		
-		//Load till higher watermark
+		//Load close to higher watermark
 		load_post(_initial_load, _initial_load + _post_load, _item_size, dclient);
 		Thread.sleep(5000);
 		
