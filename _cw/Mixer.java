@@ -136,7 +136,7 @@ public class Mixer {
 		load_post(_initial_load, _initial_load + _post_load, _item_size, dclient);
 		Thread.sleep(5000);
 		
-		System.out.println("\n Check mem_used on DEFAULT, data should be loaded till high water mark, press ENTER to proceed .. \n");
+		System.out.println("\n Check mem_used on DEFAULT, data should be loaded close to the high water mark, press ENTER to proceed .. \n");
 		sc = new Scanner(System.in);
 		@SuppressWarnings("unused")
 		String _ok_2 = sc.nextLine();
