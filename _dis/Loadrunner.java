@@ -24,6 +24,7 @@ public class Loadrunner {
 	private static int _appendCount = 1;						//No. of times to append the selected list
 	private static int _addMore = 0;							//No. of items more to add (through sets) to the created list
 	private static boolean _json = false;
+	private static String _prefix = "";
 
 	public static void main(String args[]) throws URISyntaxException, IOException{
 		
@@ -47,7 +48,7 @@ public class Loadrunner {
 			public void run() {
 				System.out.println("Sets' thread starting up .. (" + _itemCount + " items)");
 				try {
-					Creater.create_items(_itemCount, _itemSize, _json, client);
+					Creater.create_items(_itemCount, _itemSize, _json, client, _prefix);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -59,7 +60,7 @@ public class Loadrunner {
 			public void run() {
 				System.out.println("Gets' thread starting up ..");
 				try {
-					Getter.get_em_all(_itemCount, client);
+					Getter.get_em_all(_itemCount, client, _prefix);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -72,7 +73,7 @@ public class Loadrunner {
 				System.out.println("Appends' thread starting up ..");
 				for (int i=0; i<_appendCount; i++){
 					try {
-						Appender.append_items(_itemCount, _appendRatio, _appendSize, _json, client);
+						Appender.append_items(_itemCount, _appendRatio, _appendSize, _json, client, _prefix);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -85,7 +86,7 @@ public class Loadrunner {
 			public void run() {
 				System.out.println("Adds' thread starting up .. (" + _addMore + " items)");
 				try {
-					Adder.add_items(_itemCount, _itemSize, _addMore, _json, client);
+					Adder.add_items(_itemCount, _itemSize, _addMore, _json, client, _prefix);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -160,6 +161,8 @@ public class Loadrunner {
 				_appendSize = Integer.parseInt(properties.getProperty(key));
 			if (key.equals("append-count"))
 				_appendCount = Integer.parseInt(properties.getProperty(key));
+			if (key.equals("prefix"))
+				_prefix = properties.getProperty(key);
 		}
 	}
 

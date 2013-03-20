@@ -15,7 +15,7 @@ import com.couchbase.client.CouchbaseClient;
 
 public class Creater {
 
-	public static void create_items (int _itemCount, int _itemSize, boolean _json, CouchbaseClient client) 
+	public static void create_items (int _itemCount, int _itemSize, boolean _json, CouchbaseClient client, String _prefix) 
 			throws URISyntaxException, IOException, JSONException, InterruptedException, ExecutionException {
 		Random gen = new Random ( 987654321 );
 		StringBuffer value = new StringBuffer();
@@ -27,7 +27,7 @@ public class Creater {
         List<OperationFuture<Boolean>> creates = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=0; i<_itemCount; i++){
 			OperationFuture<Boolean> setOp;
-			String key = String.format("Key-%d", i);
+			String key = String.format("%s%d", _prefix, i);
 			if (_json) {
 				JSONObject _val = Spawner.retrieveJSON(gen, _itemSize);
 				setOp = client.set(key, 0, _val.toString());

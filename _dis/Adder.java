@@ -15,7 +15,7 @@ import com.couchbase.client.CouchbaseClient;
 
 public class Adder {
 
-	public static void add_items (int _itemCount, int _itemSize, int _addMore, boolean _json, CouchbaseClient client) 
+	public static void add_items (int _itemCount, int _itemSize, int _addMore, boolean _json, CouchbaseClient client, String _prefix) 
 			throws URISyntaxException, IOException, JSONException, InterruptedException, ExecutionException {
 		Random gen = new Random (123456789);
 		StringBuffer value = new StringBuffer();
@@ -27,7 +27,7 @@ public class Adder {
         List<OperationFuture<Boolean>> adds = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=_itemCount; i<(_itemCount+_addMore); i++) {
 			OperationFuture<Boolean> addOp;
-			String key = String.format("Key-%d", i);
+			String key = String.format("%s%d", _prefix, i);
 			if (_json) {
 				JSONObject _val = Spawner.retrieveJSON(gen, _itemSize);
 				addOp = client.set(key, 0, _val.toString());

@@ -14,7 +14,7 @@ import com.couchbase.client.CouchbaseClient;
 
 public class Appender {
 
-	public static void append_items (int _itemCount, double _appendRatio, int _appendSize, boolean _json, CouchbaseClient client) 
+	public static void append_items (int _itemCount, double _appendRatio, int _appendSize, boolean _json, CouchbaseClient client, String _prefix) 
 			throws URISyntaxException, IOException, JSONException, InterruptedException, ExecutionException {
 		double itemstoappend = _appendRatio * _itemCount;
 		StringBuffer value = new StringBuffer();
@@ -26,7 +26,7 @@ public class Appender {
         List<OperationFuture<Boolean>> appends = new LinkedList<OperationFuture<Boolean>>();
 		for (int i=0; i<itemstoappend; i++) {
 			OperationFuture<Boolean> appendOp;
-			String key = String.format("Key-%d", i);
+			String key = String.format("%s%d", _prefix, i);
 			if (_json) {
 				JSONObject _val = Spawner.appendJSON(i, _appendSize);
 				appendOp = client.append(0, key, _val.toString());
