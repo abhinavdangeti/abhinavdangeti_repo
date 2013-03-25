@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,6 +14,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 public class Mixer {
 	private static String _serverAddr = "10.xx.xx.xxx";
 	private static int _port = 8091;
+	private static String[] buckets = {"default", "standard_bucket0", "standard_bucket1", "standard_bucket2", "memcached_bucket0"};
 	private static int _initial_load = 1000000;
 	private static int _post_load = 500000;
 	private static int _post_factor = 10000;
@@ -40,23 +40,12 @@ public class Mixer {
 	
 	public static void main(String args[]) throws URISyntaxException, IOException, InterruptedException, ExecutionException{
 		
-		ArrayList<String> couchbase_buckets = new ArrayList<String>();
-		couchbase_buckets.add("default");
-		couchbase_buckets.add("standard_bucket0");
-		couchbase_buckets.add("standard_bucket1");
-		couchbase_buckets.add("standard_bucket2");
-		
-		String memcached_bucket = "memcached_bucket0";
-		
-		for (String s : couchbase_buckets) {
+		for (String s : buckets) {
 			CouchbaseClient client = connect(s, "");
 			load_initial(_initial_load, _item_size, client);
 			client.shutdown();
+            
 		}
-        
-		CouchbaseClient mclient = connect(memcached_bucket, "");
-		load_initial(_initial_load, _item_size, mclient);
-		mclient.shutdown();
         
 		System.out.println("--< COMPLETED STAGE 1 >--");
         
