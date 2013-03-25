@@ -16,7 +16,8 @@ public class Mixer {
 	private static String _serverAddr = "10.xx.xx.xxx";
 	private static int _port = 8091;
 	private static int _initial_load = 1000000;
-	private static int _post_load = 1000000;
+	private static int _post_load = 500000;
+	private static int _post_factor = 10000;
 	private static int _x_ = 100000;
 	private static String _prefix = "key";
 	private static int _item_size = 512;
@@ -93,7 +94,7 @@ public class Mixer {
 		Runnable _exp_ = new Runnable() {
 			public void run() {
 				try {
-					expire_post(_initial_load + _post_load - (6*_x_), _initial_load + _post_load - (5*_x_), _expiration_time, dclient);
+					expire_post(_initial_load - (5*_x_), _initial_load - _x_, _expiration_time, dclient);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -135,7 +136,7 @@ public class Mixer {
 		Runnable _aggressive_ = new Runnable() {
 			public void run() {
 				try {
-					load_post(_initial_load, _post_load*1000, _item_size / 2, dclient);
+					load_post(_initial_load, _post_load * _post_factor, _item_size / 2, dclient);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -174,7 +175,9 @@ public class Mixer {
 			expirer.join();
 			System.out.println("Expirer terminated!");
             
-			System.out.println("\n --< WAIT FOR ABOUT HALF AN HOUR BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER (RUN " + k + ") >-- \n");
+			System.out.println("Waiting for 10 minutes ..");
+			Thread.sleep(600000);
+			System.out.println("\n --< WAIT FOR SOME TIME BEFORE MANUALLY RUNNING EXPIRY PAGER ON DEFAULT and then hit ENTER (RUN " + k + ") >-- \n");
 			sc = new Scanner(System.in);
 			@SuppressWarnings("unused")
 			String _ok_3 = sc.nextLine();
@@ -210,7 +213,7 @@ public class Mixer {
             value.append(CHAR_LIST);
         }
         //        List<OperationFuture<Boolean>> sets = new LinkedList<OperationFuture<Boolean>>();
-        for (int i=3 * _initial_load / 4; i<5 * _initial_load / 4; i++){
+        for (int i=3 * _initial_load / 4; i<2 * _initial_load; i++){
         	String key = String.format("%s%d", _prefix, i);
         	OperationFuture<Boolean> setOp = client1.set(key, 0, value.toString());
             //        	sets.add(setOp);
@@ -249,7 +252,7 @@ public class Mixer {
             value.append(CHAR_LIST);
         }
         //        List<OperationFuture<Boolean>> updates = new LinkedList<OperationFuture<Boolean>>();
-		for (int i=_initial_load + _post_load - _x_; i<_initial_load + _post_load; i++){
+		for (int i=_initial_load - (8*_x_); i<_initial_load - (5*_x_); i++){
 			String key = String.format("%s%d", _prefix, i);
 			OperationFuture<Boolean> repOp = dclient.replace(key, 0, value.toString());
             //			updates.add(repOp);
@@ -268,7 +271,7 @@ public class Mixer {
     
 	protected static void delete_post(CouchbaseClient dclient) throws InterruptedException, ExecutionException {
         //		List<OperationFuture<Boolean>> deletes = new LinkedList<OperationFuture<Boolean>>();
-		for (int i=_initial_load + _post_load - (5*_x_); i<_initial_load + _post_load - _x_; i++){
+		for (int i=_initial_load - _x_; i<_initial_load; i++){
 			OperationFuture<Boolean> delOp = dclient.delete(String.format("%s%d", _prefix, i));
             //			deletes.add(delOp);
 			if (delOp.get().booleanValue() == true){
