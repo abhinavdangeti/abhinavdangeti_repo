@@ -171,6 +171,9 @@ public class Mixer {
 			@SuppressWarnings("unused")
 			String _ok_3 = sc.nextLine();
             
+			if (k == del_multiplier-1)
+				continue;
+            
 			System.out.println("Restarting the initial-post load ..");
 			Thread.sleep(3000);
 			load_post(0, _initial_load, _item_size, dclient);
