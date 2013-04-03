@@ -22,7 +22,7 @@ public class Escalated {
     private static int _expiration_time = 3600;
     private static int _item_size = 1024;
     private static int _count = 20000;
-//    private static int _final = 10000000;
+    private static int _final = 10000000;
     private static String _prefix = "key";
     private static long _RUNTIME_ = 172800000; //48 hours in milliseconds
     
@@ -56,7 +56,7 @@ public class Escalated {
         Runnable _memop_ = new Runnable() {
             public void run() {
                 try {
-					getter(mclient);
+					getter(dclient);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -91,10 +91,10 @@ public class Escalated {
         };
         
         Thread _for_default_ = new Thread(_defop_);
-        _for_default_.start();
+        _for_default_.start();			//Running ops on default
         
         Thread _for_memcachedbucket_ = new Thread(_memop_);
-        _for_memcachedbucket_.start();
+        _for_memcachedbucket_.start();		//Running gets on default
         
         _for_default_.join();
         _for_memcachedbucket_.interrupt();
@@ -159,15 +159,13 @@ public class Escalated {
 
     private static void getter(CouchbaseClient client) throws InterruptedException, ExecutionException, URISyntaxException, IOException {
 		while (true) {
-			for (int i=0; i<_count; i++) {
+			for (int i=0; i<_final; i++) {
 				Object getObject = null;
 				try {
 					getObject = client.get(String.format("%s%d", _prefix, i));
 				} catch (Exception e) {
 					//Get didn't fetch
 				}
-				if (getObject == null)
-					break;
 			}
 		}
 	}
