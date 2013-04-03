@@ -43,7 +43,7 @@ public class Escalated {
     public static void main(String args[]) throws URISyntaxException, IOException, InterruptedException, ExecutionException{
         
         for (String s : buckets) {
-            CouchbaseClient client = connect(s, " ");
+            CouchbaseClient client = connect(s, "");
             load_initial(client);
             client.shutdown();
         }
