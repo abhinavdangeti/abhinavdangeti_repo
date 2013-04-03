@@ -50,8 +50,8 @@ public class Escalated {
         
         System.out.println("Completed stage 1: initial load on all buckets ..");
         
-        final CouchbaseClient dclient = connect(buckets[0], " ");
-        final CouchbaseClient mclient = connect(buckets[1], " ");
+        final CouchbaseClient dclient = connect(buckets[0], "");
+        final CouchbaseClient mclient = connect(buckets[1], "");
         
         Runnable _memop_ = new Runnable() {
             public void run() {
