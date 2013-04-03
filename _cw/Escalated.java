@@ -18,7 +18,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 public class Escalated {
     private static String[] _serverAddrs = {"10.x.x.xxx", "10.x.x.xxx", "10.x.x.xxx"};
     private static int _port = 8091;
-	private static String[] buckets = {"default", "memcached_bucket"};
+    private static String[] buckets = {"default", "memcached_bucket"};
     private static int _expiration_time = 3600;
     private static int _item_size = 2048;
     private static int _count = 20000;
@@ -56,37 +56,37 @@ public class Escalated {
         Runnable _memop_ = new Runnable() {
             public void run() {
                 try {
-					getter(dclient);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}   
+			getter(dclient);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}   
             }
         };
         
         Runnable _defop_ = new Runnable() {
             public void run() {
                 try {
-					load_post(dclient);
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			load_post(dclient);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
             }
         };
         
@@ -105,62 +105,62 @@ public class Escalated {
     }
     
     private static void load_initial(CouchbaseClient client) throws InterruptedException, ExecutionException {
-		StringBuffer value = new StringBuffer();
-		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	StringBuffer value = new StringBuffer();
+	String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
             value.append(CHAR_LIST);
         }
-		for (int i=0; i<_count; i++){
-			OperationFuture<Boolean> setOp;
-			String key = String.format("%s%d", _prefix, i);
-			setOp = client.set(key, _expiration_time, value.toString());
-			if (setOp.get().booleanValue() == false){
-				continue;
-			}
-		}		
-	}
+	for (int i=0; i<_count; i++){
+		OperationFuture<Boolean> setOp;
+		String key = String.format("%s%d", _prefix, i);
+		setOp = client.set(key, _expiration_time, value.toString());
+		if (setOp.get().booleanValue() == false){
+			continue;
+		}
+	}		
+    }
     
     private static void load_post(CouchbaseClient client) throws InterruptedException, ExecutionException, UnknownHostException {
-		StringBuffer value = new StringBuffer();
-		String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	StringBuffer value = new StringBuffer();
+	String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
             value.append(CHAR_LIST);
         }
-		//for (int i=_count; i<_final; i++){
+	//for (int i=_count; i<_final; i++){
         long startTime = System.currentTimeMillis();
         long endTime = System.currentTimeMillis();
         int i = 0;
-		while ((endTime - startTime) < _RUNTIME_){
+	while ((endTime - startTime) < _RUNTIME_){
             while (_curr_calc(client) >= _count) {        // Set only if item count is less than 20000
                 Thread.sleep(10000);
             }
-			OperationFuture<Boolean> setOp;
-			String key = String.format("%s%d", _prefix, i);
-			setOp = client.set(key, _expiration_time, value.toString());
-			i++;
-			if (setOp.get().booleanValue() == false){
-				continue;
-			}
-			endTime = System.currentTimeMillis();
+	    	OperationFuture<Boolean> setOp;
+		String key = String.format("%s%d", _prefix, i);
+		setOp = client.set(key, _expiration_time, value.toString());
+		i++;
+		if (setOp.get().booleanValue() == false){
+			continue;
 		}
-		
+		endTime = System.currentTimeMillis();
 	}
+		
+    }
  
     private static int _curr_calc(CouchbaseClient client) throws UnknownHostException {
     	int _ep_curr_items = 0;
-		Map<SocketAddress, Map<String, String>> map = client.getStats();
-		Iterator<SocketAddress> iterator = map.keySet().iterator();
+	Map<SocketAddress, Map<String, String>> map = client.getStats();
+	Iterator<SocketAddress> iterator = map.keySet().iterator();
         
-		Map<String, Integer> hm = new HashMap<String, Integer>();
-		while (iterator.hasNext()){
+	Map<String, Integer> hm = new HashMap<String, Integer>();
+	while (iterator.hasNext()){
             Object key = iterator.next();
 			
-			if (hm.containsKey(key.toString())) {
+	    if (hm.containsKey(key.toString())) {
                 System.out.println("yes");
                 if (hm.size() == _serverAddrs.length)
                     break;
                 continue;
-			}
+	    }
             Map<String, String> map1 = map.get(key);
             Iterator<String> tt = map1.keySet().iterator();
             //System.out.println(key.toString());
@@ -175,13 +175,13 @@ public class Escalated {
                     hm.put(key.toString(), Integer.parseInt(val2.toString()));
                 }
             }
-		}
+	}
 		
-		Iterator<String> it = hm.keySet().iterator();
+	Iterator<String> it = hm.keySet().iterator();
         while (it.hasNext()) {
             _ep_curr_items += hm.get(it.next().toString());
         }
-		return _ep_curr_items;
+	return _ep_curr_items;
     }
 
     @SuppressWarnings("unused")
