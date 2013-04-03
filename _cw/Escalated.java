@@ -1,10 +1,10 @@
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class Escalated {
     private static int _port = 8091;
 	private static String[] buckets = {"default", "memcached_bucket"};
     private static int _expiration_time = 3600;
-    private static int _item_size = 1024;
+    private static int _item_size = 2048;
     private static int _count = 20000;
     private static int _final = 10000000;
     private static String _prefix = "key";
@@ -51,7 +51,7 @@ public class Escalated {
         System.out.println("Completed stage 1: initial load on all buckets ..");
         
         final CouchbaseClient dclient = connect(buckets[0], "");
-        final CouchbaseClient mclient = connect(buckets[1], "");
+        //final CouchbaseClient mclient = connect(buckets[1], "");
         
         Runnable _memop_ = new Runnable() {
             public void run() {
@@ -91,15 +91,15 @@ public class Escalated {
         };
         
         Thread _for_default_ = new Thread(_defop_);
-        _for_default_.start();			//Running ops on default
+        _for_default_.start();					//Running ops on default
         
         Thread _for_memcachedbucket_ = new Thread(_memop_);
-        _for_memcachedbucket_.start();		//Running gets on default
+        _for_memcachedbucket_.start();			//Running gets on default
         
         _for_default_.join();
         _for_memcachedbucket_.interrupt();
         dclient.shutdown();
-        mclient.shutdown();
+        //mclient.shutdown();
         System.exit(0);
         
     }
@@ -149,16 +149,45 @@ public class Escalated {
     private static int _curr_calc(CouchbaseClient client) throws UnknownHostException {
     	int _ep_curr_items = 0;
 		Map<SocketAddress, Map<String, String>> map = client.getStats();
-		for (String server : _serverAddrs) {
-			InetAddress _inetAddress = InetAddress.getByName(server);
-	      	SocketAddress socketAddress = new InetSocketAddress(_inetAddress, _port);
-	      	_ep_curr_items += Integer.parseInt(map.get(socketAddress).get("ep_curr_items"));
+		Iterator<SocketAddress> iterator = map.keySet().iterator();
+        
+		Map<String, Integer> hm = new HashMap<String, Integer>();
+		while (iterator.hasNext()){
+            Object key = iterator.next();
+			
+			if (hm.containsKey(key.toString())) {
+                System.out.println("yes");
+                if (hm.size() == _serverAddrs.length)
+                    break;
+                continue;
+			}
+            Map<String, String> map1 = map.get(key);
+            Iterator<String> tt = map1.keySet().iterator();
+            //System.out.println(key.toString());
+            while (tt.hasNext()) {
+                if (hm.containsKey(key)) {
+                    break;
+                }
+                String val1 = tt.next();
+                if ((val1.toString().equals("curr_items"))) {
+                    String val2 = map1.get(val1);
+                    //System.out.println(val1.toString() + "  " + val2.toString());
+                    hm.put(key.toString(), Integer.parseInt(val2.toString()));
+                }
+            }
 		}
+		
+		Iterator<String> it = hm.keySet().iterator();
+        while (it.hasNext()) {
+            _ep_curr_items += hm.get(it.next().toString());
+        }
 		return _ep_curr_items;
     }
 
-    private static void getter(CouchbaseClient client) throws InterruptedException, ExecutionException, URISyntaxException, IOException {
+    @SuppressWarnings("unused")
+	private static void getter(CouchbaseClient client) throws InterruptedException, ExecutionException, URISyntaxException, IOException {
 		while (true) {
+			Thread.sleep(5000);
 			for (int i=0; i<_final; i++) {
 				Object getObject = null;
 				try {
