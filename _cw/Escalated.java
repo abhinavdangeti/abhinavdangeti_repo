@@ -22,7 +22,7 @@ public class Escalated {
     private static int _expiration_time = 3600;
     private static int _item_size = 1024;
     private static int _count = 20000;
-    private static int _final = 10000000;
+//    private static int _final = 10000000;
     private static String _prefix = "key";
     private static long _RUNTIME_ = 172800000; //48 hours in milliseconds
     
