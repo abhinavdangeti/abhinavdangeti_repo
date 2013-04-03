@@ -24,6 +24,7 @@ public class Escalated {
     private static int _count = 20000;
     private static int _final = 10000000;
     private static String _prefix = "key";
+    private static long _RUNTIME_ = 172800000; //48 hours in milliseconds
     
     static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
         List<URI> uris = new LinkedList<URI>();
@@ -125,14 +126,18 @@ public class Escalated {
         while (value.length() < _item_size) {
             value.append(CHAR_LIST);
         }
-		for (int i=_count; i<_final; i++){
-			
+		//for (int i=_count; i<_final; i++){
+        long startTime = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis();
+        int i = 0;
+		while ((endTime - startTime) < _RUNTIME_){
             while (_curr_calc(client) >= _count) {        // Set only if item count is less than 20000
                 Thread.sleep(10000);
             }
 			OperationFuture<Boolean> setOp;
 			String key = String.format("%s%d", _prefix, i);
 			setOp = client.set(key, _expiration_time, value.toString());
+			i++;
 			if (setOp.get().booleanValue() == false){
 				continue;
 			}
