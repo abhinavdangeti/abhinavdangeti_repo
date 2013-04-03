@@ -141,6 +141,7 @@ public class Escalated {
 			if (setOp.get().booleanValue() == false){
 				continue;
 			}
+			endTime = System.currentTimeMillis();
 		}
 		
 	}
