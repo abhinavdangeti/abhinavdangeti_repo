@@ -215,7 +215,7 @@ class cbrTests(preSet):
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
 
-            #TODO: Ensure vbucket map unchanged if swap rebalance
+            #TOVERIFY: Ensure vbucket map unchanged if swap rebalance
             if self._failover_count == self._add_count:
                 _diff_count_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after)
                 if _diff_count_ > 0:
@@ -265,7 +265,7 @@ class cbrTests(preSet):
                     for node in failed_nodes:
                         shell = RemoteMachineShellConnection(node)
                         shell.log_command_output(o, r)
-                        o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REFECT")
+                        o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                         shell.disconnect()
                 self.wait_for_failover_or_assert(self._source_master, self._failover_count, self._xdcr_ref._timeout)
                 for node in failed_nodes:
@@ -321,7 +321,7 @@ class cbrTests(preSet):
                     for node in failed_nodes:
                         shell = RemoteMachineShellConnection(node)
                         shell.log_command_output(o, r)
-                        o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REFECT")
+                        o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                         shell.disconnect()
                 self.wait_for_failover_or_assert(self._sink_master, self._failover_count, self._xdcr_ref._timeout)
                 for node in failed_nodes:
@@ -353,7 +353,7 @@ class cbrTests(preSet):
                         shell.log_command_output(o, r)
                         shell.disconnect()
 
-            #TODO: Ensure vbucket map unchanged if swap rebalance
+            #TOVERIFY: Ensure vbucket map unchanged if swap rebalance
             if self._failover_count == self._add_count:
                 _diff_count_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after)
                 if _diff_count_ > 0:
