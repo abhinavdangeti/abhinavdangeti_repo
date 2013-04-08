@@ -455,6 +455,10 @@ class preSet(unittest.TestCase):
             dest_key_index += 1
 
     def _join_clusters(self, source_cluster_name, source_master, sink_cluster_name, sink_master):
+        if source_master.ip != sink_master.ip:
+            if self._failover is not None:
+                self.set_environ_param('XDCR_FAILURE_RESTART_INTERVAL',1)
+        time.sleep(self._timeout / 2)
         self._link_clusters(source_cluster_name, source_master, sink_cluster_name, sink_master)
         time.sleep(self._timeout / 3)
         self._replicate_clusters(source_master, sink_cluster_name)
