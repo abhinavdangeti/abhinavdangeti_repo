@@ -125,7 +125,7 @@ class preSet:
                 o, r = shell.execute_command("C:/Program\ Files/Couchbase/Server/bin/cbrecovery.exe http://{0}:{1} http://{2}:{3}".format(
                                                     _healthy_.ip, _healthy_.port, _compromised_.ip, _compromised_.port))
                 shell.log_command_output(o, r)
-        shell.disconnect())
+        shell.disconnect()
 
     def vbucket_map_checker(self, _before_, _after_):
         change_count = 0
