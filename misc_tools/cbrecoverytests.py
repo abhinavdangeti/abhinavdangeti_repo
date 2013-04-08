@@ -156,6 +156,8 @@ class preSet(unittest.TestCase):
                 self.set_environ_param('XDCR_LATENCY_OPTIMIZATION',True)
 
         self._cluster_state_arr = []
+        self._poll_interval = self._input.param("poll_interval", 5)
+        self._poll_timeout = self._input.param("poll_timeout", 120)
         self._log.info("Initializing input parameters completed.")   
 
     def set_environ_param(self, _parameter, value):
