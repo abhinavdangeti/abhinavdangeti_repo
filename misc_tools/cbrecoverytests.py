@@ -14,7 +14,7 @@ from mc_bin_client import MemcachedError
 from basetestcase import BaseTestCase
 from xdcr.xdcrbasetests import XDCRReplicationBaseTest
 
-class preSet:
+class preSet(unittest.TestCase):
     def setUp(self):
         try:
             self._xdcr_ref = XDCRReplicationBaseTest()
