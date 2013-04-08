@@ -147,7 +147,7 @@ class cbrTests(preSet):
         tasks = []
         if self._xdcr_ref._doc_ops is not None:
             if "update" in self._xdcr_ref._doc_ops:
-                tasks.extend(self._xdcr_ref._async_load_all_buckets(self._xdcr_ref.src_master, self._xdcr_ref.gen_update, "update", self._xdcr_ref._expires)
+                tasks.extend(self._xdcr_ref._async_load_all_buckets(self._xdcr_ref.src_master, self._xdcr_ref.gen_update, "update", self._xdcr_ref._expires))
             if "delete" in self._xdcr_ref._doc_ops:
                 tasks.extend(self._xdcr_ref._async_load_all_buckets(self._xdcr_ref.src_master, self._xdcr_ref.gen_delete, "delete", 0))
         for task in tasks:
@@ -233,7 +233,7 @@ class cbrTests(preSet):
         tasks = []
         if self._xdcr_ref._doc_ops is not None:
             if "update" in self._xdcr_ref._doc_ops:
-                tasks.extend(self._xdcr_ref._async_load_all_buckets(self._xdcr_ref.src_master, self._xdcr_ref.gen_update, "update", self._xdcr_ref._expires)
+                tasks.extend(self._xdcr_ref._async_load_all_buckets(self._xdcr_ref.src_master, self._xdcr_ref.gen_update, "update", self._xdcr_ref._expires))
             if "delete" in self._xdcr_ref._doc_ops:
                 tasks.extend(self._xdcr_ref._async_load_all_buckets(self._xdcr_ref.src_master, self._xdcr_ref.gen_delete, "delete", 0))
         for task in tasks:
