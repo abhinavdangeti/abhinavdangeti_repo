@@ -511,7 +511,7 @@ class preSet(unittest.TestCase):
         for bucket in buckets:
             ClusterOperationHelper.flushctl_set(master, "exp_pager_stime", 10, bucket)
             self._log.info("wait for expiry pager to run on all these nodes")
-            self.sleep(30)
+            time.sleep(self._timeout)
 
     def _wait_for_stats_all_buckets(self, servers, timeout=120):
         def verify():
