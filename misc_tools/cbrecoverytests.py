@@ -32,7 +32,6 @@ class preSet(unittest.TestCase):
 
             self._init_clusters()
             self._setup_topology()
-#            self._load_data()
             self._log.info("==============  cbRecoveryTests setup was finished for test #{0} {1} =============="\
                 .format(self._case_number, self._testMethodName))
 
@@ -385,8 +384,8 @@ class preSet(unittest.TestCase):
         if verify_src:
             timeout *= 3 / 2
 
-        self._expiry_pager(self.source_nodes[0])
-        self._expiry_pager(self.sink_nodes[0])
+        self._expiry_pager(self._source[0])
+        self._expiry_pager(self._sink[0])
         end_time = time.time() + timeout
         if verify_src:
             self._log.info("and Verify xdcr replication stats at Source Cluster : {0}".format(self._source_master.ip))
@@ -452,17 +451,6 @@ class preSet(unittest.TestCase):
             sink_cluster_name = self._cluster_names_dic[dest_key]
             self._join_clusters(source_cluster_name, self._source_master, sink_cluster_name, self._sink_master)
             dest_key_index += 1
-#
-#    def _load_data(self):
-#        for key in self._clusters_keys_olst:
-#            cluster_node = self._clusters_dic[key][0]
-#            cluster_name = self._cluster_names_dic[key]
-#            self._log.info("Starting Load # items {0} node {1} , cluster {2}....".format(self._num_items, cluster_node,
-#                cluster_name))
-#            self._load_gen_data(cluster_name, cluster_node)
-#            if "unidirection" in self._rdirection:
-#                break
-#        self._log.info("Completed Load")
 
     def _join_clusters(self, source_cluster_name, source_master, sink_cluster_name, sink_master):
         self._link_clusters(source_cluster_name, source_master, sink_cluster_name, sink_master)
@@ -486,32 +474,6 @@ class preSet(unittest.TestCase):
             time.sleep(5)
         if self._get_cluster_buckets(source_master):
             self._cluster_state_arr.append((rest_conn_src, sink_cluster_name, rep_database, rep_id))
-#
-#    def _load_gen_data(self, cname, node):
-#        for op_type in self._seed_data_ops_lst:
-#            num_items_ratio = self._get_num_items_ratio(op_type)
-#            load_gen = BlobGenerator(cname, cname, self._value_size, end=num_items_ratio)
-#            self._log.info("Starting Load operation '{0}' for items (ratio) '{1}' on node '{2}'....".format(op_type,
-#                num_items_ratio, cname))
-#            if self._seed_data_mode_str == XDCRConstants.SEED_DATA_MODE_SYNC:
-#                self._load_all_buckets(node, load_gen, op_type, 0)
-#                self._log.info("Completed Load of {0}".format(op_type))
-#            else:
-#                self._async_load_all_buckets(node, load_gen, op_type, 0)
-#                self._log.info("Started async Load of {0}".format(op_type))
-#
-#    def _get_num_items_ratio(self, op_type):
-#        if op_type in ["update", "delete"]:
-#            return self._num_items / 3
-#        else:
-#            return self._num_items
-
-#    def _async_load_bucket(self, bucket, server, kv_gen, op_type, exp, kv_store=1, flag=0, only_store_hash=True, batch_size=1000, pause_secs=1, timeout_secs=30):
-#        gen = copy.deepcopy(kv_gen)
-#        task = self._cluster_helper.async_load_gen_docs(server, bucket.name, gen,
-#                                                          bucket.kvs[kv_store],
-#                                                          op_type, exp, flag, only_store_hash, batch_size, pause_secs, timeout_secs)
-#        return task
 
     def _async_load_all_buckets(self, server, kv_gen, op_type, exp, kv_store=1, flag=0, only_store_hash=True, batch_size=1, pause_secs=1, timeout_secs=30):
         tasks = []
@@ -522,10 +484,6 @@ class preSet(unittest.TestCase):
                                                           bucket.kvs[kv_store],
                                                           op_type, exp, flag, only_store_hash, batch_size, pause_secs, timeout_secs))
         return tasks
-
-#    def _load_bucket(self, bucket, server, kv_gen, op_type, exp, kv_store=1, flag=0, only_store_hash=True, batch_size=1000, pause_secs=1, timeout_secs=30):
-#        task = self._async_load_bucket(bucket, server, kv_gen, op_type, exp, kv_store, flag, only_store_hash, batch_size, pause_secs, timeout_secs)
-#        task.result()
 
     def _load_all_buckets(self, server, kv_gen, op_type, exp, kv_store=1, flag=0, only_store_hash=True, batch_size=1000, pause_secs=1, timeout_secs=30):
         tasks = self._async_load_all_buckets(server, kv_gen, op_type, exp, kv_store, flag, only_store_hash, batch_size, pause_secs, timeout_secs)
