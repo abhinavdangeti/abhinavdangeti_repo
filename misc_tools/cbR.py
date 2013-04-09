@@ -31,7 +31,7 @@ class CBRbaseclass(XDCRReplicationBaseTest):
             failover_count = self.get_failover_count(master)
             if failover_count == autofailover_count:
                 break
-            time.sleep(2)
+            self.sleep(2)
 
         if failover_count != autofailover_count:
             rest = RestConnection(master)
@@ -100,10 +100,10 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         for task in tasks:
             task.result()
 
-        time.sleep(self._timeout)
+        self.sleep(self._timeout)
         vbucket_map_before = []
         vbucket_map_after = []
-        time.sleep(self._timeout)
+        self.sleep(self._timeout)
         if self._failover is not None:
             if "source" in self._failover:
                 rest = RestConnection(self.src_master)
@@ -121,7 +121,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self._cluster_helper.failover(self.src_nodes, failed_nodes)
                 for node in failed_nodes:
                     self.src_nodes.remove(node)
-                time.sleep(self._timeout / 4)
+                self.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
 
                 for node in add_nodes:
@@ -150,7 +150,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self._cluster_helper.failover(self.dest_nodes, failed_nodes)
                 for node in failed_nodes:
                     self.dest_nodes.remove(node)
-                time.sleep(self._timeout / 4)
+                self.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
 
                 for node in add_nodes:
@@ -171,7 +171,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 else:
                     self._log.info("vbucket_map retained after swap rebalance")
 
-        time.sleep(self._timeout / 2)
+        self.sleep(self._timeout / 2)
         self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
         self.verify_results()
 
@@ -187,7 +187,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         for task in tasks:
             task.result()
 
-        time.sleep(self._timeout / 2)
+        self.sleep(self._timeout / 2)
         if self._failover is not None:
             if "source" in self._failover:
                 rest = RestConnection(self.src_master)
@@ -218,7 +218,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self.wait_for_failover_or_assert(self.src_master, self._failover_count, self._timeout)
                 for node in failed_nodes:
                     self.src_nodes.remove(node)
-                time.sleep(self._timeout / 4)
+                self.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
                 for node in add_nodes:
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
@@ -274,7 +274,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self.wait_for_failover_or_assert(self.dest_master, self._failover_count, self._timeout)
                 for node in failed_nodes:
                     self.dest_nodes.remove(node)
-                time.sleep(self._timeout / 4)
+                self.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
                 for node in add_nodes:
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
@@ -309,6 +309,6 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 else:
                     self._log.info("vbucket_map retained after swap rebalance")
 
-        time.sleep(self._timeout / 2)
+        self.sleep(self._timeout / 2)
         self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
         self.verify_results()
