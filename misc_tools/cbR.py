@@ -90,13 +90,13 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         super(cbrecovery, self).tearDown()
 
     def cbrecover_multiple_failover_swapout_reb_routine(self):
-        self._load_all_buckets(self._source_master, self.gen_create, "create", 0)
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
         tasks = []
         if self._doc_ops is not None:
             if "update" in self._doc_ops:
-                tasks.extend(self._async_load_all_buckets(self._source_master, self.gen_update, "update", self._expires))
+                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires))
             if "delete" in self._doc_ops:
-                tasks.extend(self._async_load_all_buckets(self._source_master, self.gen_delete, "delete", 0))
+                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_delete, "delete", 0))
         for task in tasks:
             task.result()
 
@@ -106,9 +106,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         time.sleep(self._timeout)
         if self._failover is not None:
             if "source" in self._failover:
-                rest = RestConnection(self._source_master)
+                rest = RestConnection(self.src_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
-                if self._failover_count >= len(self._source):
+                if self._failover_count >= len(self.src_nodes):
                     self._log.info("Won't failover .. count exceeds available servers on source : SKIPPING TEST")
                     self.tearDown()
                     return
@@ -117,27 +117,27 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     self.tearDown()
                     return
                 self._log.info("Failing over {0} nodes on source ..".format(self._failover_count))
-                failed_nodes = self._source[(len(self._source)-self._failover_count):len(self._source)]
-                self._cluster_helper.failover(self._source, failed_nodes)
+                failed_nodes = self.src_nodes[(len(self.src_nodes)-self._failover_count):len(self.src_nodes)]
+                self._cluster_helper.failover(self.src_nodes, failed_nodes)
                 for node in failed_nodes:
-                    self._source.remove(node)
+                    self.src_nodes.remove(node)
                 time.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
 
                 for node in add_nodes:
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
-                self._source.extend(add_nodes)
+                self.src_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self._sink_master, self._source_master)
+                self.cbr_routine(self.dest_master, self.src_master)
 
-                rest.rebalance(otpNodes=[node.id for node in self._source], ejectedNodes=[failed_nodes])
+                rest.rebalance(otpNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
 
             elif "destination" in self._failover:
-                rest = RestConnection(self._sink_master)
+                rest = RestConnection(self.dest_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
-                if self._failover_count >= len(self._sink):
+                if self._failover_count >= len(self.dest_nodes):
                     self._log.info("Won't failover .. count exceeds available servers on sink : SKIPPING TEST")
                     self.tearDown()
                     return
@@ -146,20 +146,20 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     self.tearDown()
                     return
                 self._log.info("Failing over {0} nodes on destination ..".format(self._failover_count))
-                failed_nodes = self._sink[(len(self._sink)-self._failover_count):len(self._sink)]
-                self._cluster_helper.failover(self._sink, failed_nodes)
+                failed_nodes = self.dest_nodes[(len(self.dest_nodes)-self._failover_count):len(self.dest_nodes)]
+                self._cluster_helper.failover(self.dest_nodes, failed_nodes)
                 for node in failed_nodes:
-                    self._sink.remove(node)
+                    self.dest_nodes.remove(node)
                 time.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
 
                 for node in add_nodes:
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
-                self._sink.extend(add_nodes)
+                self.dest_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self._source_master, self._sink_master)
+                self.cbr_routine(self.src_master, self.dest_master)
 
-                rest.rebalance(optNodes=[node.id for node in self._source], ejectedNodes=[failed_nodes])
+                rest.rebalance(optNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
 
@@ -172,27 +172,27 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     self._log.info("vbucket_map retained after swap rebalance")
 
         time.sleep(self._timeout / 2)
-        self.merge_buckets(self._source_master, self._sink_master, bidirection=False)
+        self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
         self.verify_results()
 
     def cbrecover_multiple_autofailover_swapout_reb_routine(self):
         failover_reason = self._input.param("failover_reason", "stop_server")     # or firewall_block
-        self._load_all_buckets(self._source_master, self.gen_create, "create", 0)
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
         tasks = []
         if self._doc_ops is not None:
             if "update" in self._doc_ops:
-                tasks.extend(self._async_load_all_buckets(self._source_master, self.gen_update, "update", self._expires))
+                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires))
             if "delete" in self._doc_ops:
-                tasks.extend(self._async_load_all_buckets(self._source_master, self.gen_delete, "delete", 0))
+                tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_delete, "delete", 0))
         for task in tasks:
             task.result()
 
         time.sleep(self._timeout / 2)
         if self._failover is not None:
             if "source" in self._failover:
-                rest = RestConnection(self._source_master)
+                rest = RestConnection(self.src_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
-                if self._failover_count >= len(self._source):
+                if self._failover_count >= len(self.src_nodes):
                     self._log.info("Won't failover .. count exceeds available servers on source : SKIPPING TEST")
                     self.tearDown()
                     return
@@ -203,7 +203,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
 
                 self._autofail_enable(rest)
                 self._log.info("Triggering {0} over {1} nodes on source ..".format(failover_reason, self._failover_count))
-                failed_nodes = self._source[(len(self._source)-self._failover_count):len(self._source)]
+                failed_nodes = self.src_nodes[(len(self.src_nodes)-self._failover_count):len(self.src_nodes)]
                 if "stop_server" in failover_reason:
                     for node in failed_nodes:
                         shell = RemoteMachineShellConnection(node)
@@ -215,18 +215,18 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                         shell.log_command_output(o, r)
                         o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                         shell.disconnect()
-                self.wait_for_failover_or_assert(self._source_master, self._failover_count, self._timeout)
+                self.wait_for_failover_or_assert(self.src_master, self._failover_count, self._timeout)
                 for node in failed_nodes:
-                    self._source.remove(node)
+                    self.src_nodes.remove(node)
                 time.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
                 for node in add_nodes:
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
-                self._source.extend(add_nodes)
+                self.src_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self._sink_master, self._source_master)
+                self.cbr_routine(self.dest_master, self.src_master)
 
-                rest.rebalance(otpNodes=[node.id for node in self._source], ejectedNodes=[failed_nodes])
+                rest.rebalance(otpNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
 
@@ -246,9 +246,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                         shell.disconnect()
 
             elif "destination" in self._failover:
-                rest = RestConnection(self._sink_master)
+                rest = RestConnection(self.dest_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
-                if self._failover_count >= len(self._sink):
+                if self._failover_count >= len(self.dest_nodes):
                     self._log.info("Won't failover .. count exceeds available servers on source : SKIPPING TEST")
                     self.tearDown()
                     return
@@ -259,7 +259,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
 
                 self._autofail_enable(rest)
                 self._log.info("Triggering {0} over {1} nodes on source ..".format(failover_reason, self._failover_count))
-                failed_nodes = self._sink[(len(self._sink)-self._failover_count):len(self._sink)]
+                failed_nodes = self.dest_nodes[(len(self.dest_nodes)-self._failover_count):len(self.dest_nodes)]
                 if "stop_server" in failover_reason:
                     for node in failed_nodes:
                         shell = RemoteMachineShellConnection(node)
@@ -271,18 +271,18 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                         shell.log_command_output(o, r)
                         o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                         shell.disconnect()
-                self.wait_for_failover_or_assert(self._sink_master, self._failover_count, self._timeout)
+                self.wait_for_failover_or_assert(self.dest_master, self._failover_count, self._timeout)
                 for node in failed_nodes:
-                    self._sink.remove(node)
+                    self.dest_nodes.remove(node)
                 time.sleep(self._timeout / 4)
                 add_nodes = self._spares[0:self._add_count]
                 for node in add_nodes:
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
-                self._sink.extend(add_nodes)
+                self.dest_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self._source_master, self._sink_master)
+                self.cbr_routine(self.src_master, self.dest_master)
 
-                rest.rebalance(otpNodes=[node.id for node in self._sink], ejectedNodes=[failed_nodes])
+                rest.rebalance(otpNodes=[node.id for node in self.dest_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
 
@@ -310,5 +310,5 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     self._log.info("vbucket_map retained after swap rebalance")
 
         time.sleep(self._timeout / 2)
-        self.merge_buckets(self._source_master, self._sink_master, bidirection=False)
+        self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
         self.verify_results()
