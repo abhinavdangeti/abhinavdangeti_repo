@@ -59,14 +59,18 @@ class CBRbaseclass(XDCRReplicationBaseTest):
     def cbr_routine(self, _healthy_, _compromised_):
         shell = RemoteMachineShellConnection(_healthy_)
         info = shell.extract_remote_info()
-        for bucket in self._buckets:
+        for bucket in self.buckets:
             if info.type.lower() == "linux":
-                o, r = shell.execute_command("/opt/couchbase/bin/cbrecovery http://{0}:{1} http://{2}:{3}".format(
-                                                    _healthy_.ip, _healthy_.port, _compromised_.ip, _compromised_.port))
+                o, r = shell.execute_command("/opt/couchbase/bin/cbrecovery http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
+                                                    _healthy_.rest_username, _healthy.rest_password, _healthy_.ip, _healthy_.port, 
+                                                    _compromised_.rest_username, _compromised_.rest_password, _compromised_.ip, _compromised_.port,
+                                                    bucket.name))
                 shell.log_command_output(o, r)
             elif info.type.lower() == "windows":
-                o, r = shell.execute_command("C:/Program\ Files/Couchbase/Server/bin/cbrecovery.exe http://{0}:{1} http://{2}:{3}".format(
-                                                    _healthy_.ip, _healthy_.port, _compromised_.ip, _compromised_.port))
+                o, r = shell.execute_command("C:/Program\ Files/Couchbase/Server/bin/cbrecovery.exe http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
+                                                    _healthy_.rest_username, _healthy.rest_password, _healthy_.ip, _healthy_.port, 
+                                                    _compromised_.rest_username, _compromised_.rest_password, _compromised_.ip, _compromised_.port,
+                                                    bucket.name))
                 shell.log_command_output(o, r)
         shell.disconnect()
 
