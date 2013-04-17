@@ -73,14 +73,31 @@ class CBRbaseclass(XDCRReplicationBaseTest):
 #        shell.log_command_output(o, r)
         shell.disconnect()
 
-    def vbucket_map_checker(self, _before_, _after_):
-        change_count = 0
-        if len(_before)==len(_after_):
-            for i in range(len(_before_)):
-                if _before_[i][0] != _after_[i][0]:
-                    change_count += 1
-        return change_count
+    def vbucket_map_checker(self, _before_, _after_, _ini_, _fin_):
+        _pre_ = {}
+        _post_ = {}
 
+        for i in range(_ini_):
+            _pre_[i] = 0
+        for i in range(_fin_):
+            _post_[i] = 0
+
+        for i in _before_:
+            for j in range(_ini_):
+                if i[0] == j:
+                    _pre_[j] += 1
+
+        for i in _after_:
+            for j in range(_fin_):
+                if i[0] == j:
+                    _post_[j] += 1
+
+        for i in _pre_.keys():
+            for j in _post_.keys():
+                if i == j:
+                    if _pre_[i] != _post_[j]:
+                        return False
+        return True
 
 #Assumption that at least 2 nodes on every cluster
 class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
@@ -105,10 +122,13 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
 
         self.sleep(self._timeout / 3)
         vbucket_map_before = []
+        initial_node_count = 0
         vbucket_map_after = []
+        final_node_count = 0
 
         if self._failover is not None:
             if "source" in self._failover:
+                initial_node_count = len(self.src_nodes)
                 rest = RestConnection(self.src_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
                 if self._failover_count >= len(self.src_nodes):
@@ -136,8 +156,10 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 rest.rebalance(otpNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
+                final_node_count = len(self.src_nodes)
 
             elif "destination" in self._failover:
+                initial_node_count = len(self.dest_nodes)
                 rest = RestConnection(self.dest_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
                 if self._failover_count >= len(self.dest_nodes):
@@ -165,14 +187,15 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 rest.rebalance(optNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
+                final_node_count = len(self.dest_nodes)
 
             #TOVERIFY: Ensure vbucket map unchanged if swap rebalance
             if self._failover_count == self._add_count:
-                _diff_count_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after)
-                if _diff_count_ > 0:
-                    self.fail("vbucket_map seems to have changed, inspite of swap rebalance!")
-                else:
+                _flag_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after, initial_node_count, final_node_count)
+                if _flag_:
                     self.log.info("vbucket_map retained after swap rebalance")
+                else:
+                    self.fail("vbucket_map seems to have changed, inspite of swap rebalance!")
 
         self.sleep(self._timeout / 2)
         self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
@@ -190,9 +213,15 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         for task in tasks:
             task.result()
 
-        self.sleep(self._timeout / 2)
+        self.sleep(self._timeout / 3)
+        vbucket_map_before = []
+        initial_node_count = 0
+        vbucket_map_after = []
+        final_node_count = 0
+
         if self._failover is not None:
             if "source" in self._failover:
+                initial_node_count = len(self.src_nodes)
                 rest = RestConnection(self.src_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
                 if self._failover_count >= len(self.src_nodes):
@@ -232,6 +261,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 rest.rebalance(otpNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
+                initial_node_count = len(self.src_nodes)
 
                 self._autofail_disable(rest)
                 if "stop_server" in failover_reason:
@@ -249,6 +279,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                         shell.disconnect()
 
             elif "destination" in self._failover:
+                initial_node_count = len(self.dest_nodes)
                 rest = RestConnection(self.dest_master)
                 vbucket_map_before = rest.fetch_vbucket_map()       # JUST FOR DEFAULT BUCKET AS OF NOW
                 if self._failover_count >= len(self.dest_nodes):
@@ -288,6 +319,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 rest.rebalance(otpNodes=[node.id for node in self.dest_nodes], ejectedNodes=[failed_nodes])
                 rest.rebalance_reached()
                 vbucket_map_after = rest.fetch_vbucket_map()
+                final_node_count = len(self.dest_nodes)
 
                 self._autofail_disable(rest)
                 if "stop_server" in failover_reason:
@@ -306,11 +338,11 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
 
             #TOVERIFY: Ensure vbucket map unchanged if swap rebalance
             if self._failover_count == self._add_count:
-                _diff_count_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after)
-                if _diff_count_ > 0:
-                    self.fail("vbucket_map seems to have changed, inspite of swap rebalance!")
-                else:
+                _flag_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after, initial_node_count, final_node_count)
+                if _flag_:
                     self.log.info("vbucket_map retained after swap rebalance")
+                else:
+                    self.fail("vbucket_map seems to have changed, inspite of swap rebalance!")
 
         self.sleep(self._timeout / 2)
         self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
