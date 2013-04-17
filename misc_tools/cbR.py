@@ -2,7 +2,10 @@ from xdcr.xdcrbasetests import XDCRReplicationBaseTest
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection
 from membase.helper.cluster_helper import ClusterOperationHelper
+from memcached.helper.data_helper import MemcachedClientHelper
 from random import randrange
+import time
+import paramiko
 
 class CBRbaseclass(XDCRReplicationBaseTest):
     def _autofail_enable(self, _rest_):
@@ -56,22 +59,50 @@ class CBRbaseclass(XDCRReplicationBaseTest):
 
         return failover_count
 
+    def wait_for_catchup(self, servers):
+        for bucket in self.buckets:
+            _items = 0
+            start = time.time()
+            while time.time() - start < 600:
+                for server in servers:
+                    mc = MemcachedClientHelper.direct_client(server, bucket.name)
+                    _items += mc.stats()["curr_items"]
+                if _items == self._num_items:
+                    break
+                self.sleep(self._timeout)
+
     def cbr_routine(self, _healthy_, _compromised_):
         shell = RemoteMachineShellConnection(_healthy_)
         info = shell.extract_remote_info()
+        _ssh_client = paramiko.SSHClient()
+        _ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        _ssh_client.connect(hostname=_healthy_.ip,username=_healthy_.ssh_username,password=_healthy_.ssh_password)
         for bucket in self.buckets:
             if info.type.lower() == "linux":
-                o, r = shell.execute_command("/opt/couchbase/bin/cbrecovery http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
+                command = "/opt/couchbase/bin/cbrecovery http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
                                                     _healthy_.rest_username, _healthy_.rest_password, _healthy_.ip, _healthy_.port, 
                                                     _compromised_.rest_username, _compromised_.rest_password, _compromised_.ip, _compromised_.port,
-                                                    bucket.name))
+                                                    bucket.name)
+                self.log.info("Running command .. {0}".format(command))
+                _ssh_client.exec_command(command)
             elif info.type.lower() == "windows":
-                o, r = shell.execute_command("C:/Program\ Files/Couchbase/Server/bin/cbrecovery.exe http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
+                command =  "C:/Program\ Files/Couchbase/Server/bin/cbrecovery.exe http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
                                                     _healthy_.rest_username, _healthy_.rest_password, _healthy_.ip, _healthy_.port, 
                                                     _compromised_.rest_username, _compromised_.rest_password, _compromised_.ip, _compromised_.port,
-                                                    bucket.name))
-        shell.log_command_output(o, r)
+                                                    bucket.name)
+                self.log.info("Running command .. {0}".format(command))
+                _ssh_client.exec_command(command)
         shell.disconnect()
+
+    def trigger_rebalance(self, _nodes_, failed_nodes):
+        _remove_ = []
+        for node in _nodes_:
+            for item in failed_nodes:
+                if node.ip == item.ip:
+                    _nodes_.remove(node)
+                    _remove_.append(node)
+        rest.rebalance(otpNodes=["ns_1@{0}".format(node.ip) for node in _nodes_], ejectedNodes=["ns_1@{0}".format(item.ip) for item in _remove_])
+        rest.rebalance_reached()
 
     def vbucket_map_checker(self, _before_, _after_, _ini_, _fin_):
         _pre_ = {}
@@ -91,6 +122,9 @@ class CBRbaseclass(XDCRReplicationBaseTest):
             for j in range(_fin_):
                 if i[0] == j:
                     _post_[j] += 1
+
+        print "pre: {0}".format(_pre_)
+        print "post: {0}".format(_post_)
 
         for i in _pre_.keys():
             for j in _post_.keys():
@@ -152,9 +186,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self.src_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
                 self.cbr_routine(self.dest_master, self.src_master)
+                self.wait_for_catchup(self.src_nodes)
 
-                rest.rebalance(otpNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
-                rest.rebalance_reached()
+                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 final_node_count = len(self.src_nodes)
 
@@ -183,19 +217,19 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self.dest_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
                 self.cbr_routine(self.src_master, self.dest_master)
+                self.wait_for_catchup(self.dest_nodes)
 
-                rest.rebalance(optNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
-                rest.rebalance_reached()
+                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 final_node_count = len(self.dest_nodes)
 
-            #TOVERIFY: Ensure vbucket map unchanged if swap rebalance
+            #TOVERIFY: Check if vbucket map unchanged if swap rebalance
             if self._failover_count == self._add_count:
                 _flag_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after, initial_node_count, final_node_count)
                 if _flag_:
-                    self.log.info("vbucket_map retained after swap rebalance")
+                    self.log.info("vbucket_map same as earlier")
                 else:
-                    self.fail("vbucket_map seems to have changed, inspite of swap rebalance!")
+                    self.log.info("vbucket_map differs from earlier")
 
         self.sleep(self._timeout / 2)
         self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
@@ -257,9 +291,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self.src_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
                 self.cbr_routine(self.dest_master, self.src_master)
+                self.wait_for_catchup(self.src_nodes)
 
-                rest.rebalance(otpNodes=[node.id for node in self.src_nodes], ejectedNodes=[failed_nodes])
-                rest.rebalance_reached()
+                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 initial_node_count = len(self.src_nodes)
 
@@ -315,9 +349,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self.dest_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
                 self.cbr_routine(self.src_master, self.dest_master)
+                self.wait_for_catchup(self.dest_nodes)
 
-                rest.rebalance(otpNodes=[node.id for node in self.dest_nodes], ejectedNodes=[failed_nodes])
-                rest.rebalance_reached()
+                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 final_node_count = len(self.dest_nodes)
 
@@ -340,9 +374,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
             if self._failover_count == self._add_count:
                 _flag_ = self.vbucket_map_checker(vbucket_map_before, vbucket_map_after, initial_node_count, final_node_count)
                 if _flag_:
-                    self.log.info("vbucket_map retained after swap rebalance")
+                    self.log.info("vbucket_map same as earlier")
                 else:
-                    self.fail("vbucket_map seems to have changed, inspite of swap rebalance!")
+                    self.log.info("vbucket_map differs from earlier")
 
         self.sleep(self._timeout / 2)
         self.merge_buckets(self.src_master, self.dest_master, bidirection=False)
