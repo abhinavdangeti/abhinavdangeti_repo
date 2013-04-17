@@ -61,7 +61,7 @@ class CBRbaseclass(XDCRReplicationBaseTest):
         info = shell.extract_remote_info()
         for bucket in self.buckets:
             if info.type.lower() == "linux":
-                o, r = shell.execute_command_raw("/opt/couchbase/bin/cbrecovery http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
+                o, r = shell.execute_command("/opt/couchbase/bin/cbrecovery http://{0}:{1}@{2}:{3} http://{4}:{5}@{6}:{7} -b {8} -B {8}".format(
                                                     _healthy_.rest_username, _healthy_.rest_password, _healthy_.ip, _healthy_.port, 
                                                     _compromised_.rest_username, _compromised_.rest_password, _compromised_.ip, _compromised_.port,
                                                     bucket.name))
@@ -70,7 +70,7 @@ class CBRbaseclass(XDCRReplicationBaseTest):
                                                     _healthy_.rest_username, _healthy_.rest_password, _healthy_.ip, _healthy_.port, 
                                                     _compromised_.rest_username, _compromised_.rest_password, _compromised_.ip, _compromised_.port,
                                                     bucket.name))
-#        shell.log_command_output(o, r)
+        shell.log_command_output(o, r)
         shell.disconnect()
 
     def vbucket_map_checker(self, _before_, _after_, _ini_, _fin_):
