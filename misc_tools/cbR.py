@@ -1,6 +1,6 @@
 from xdcr.xdcrbasetests import XDCRReplicationBaseTest
 from remote.remote_util import RemoteMachineShellConnection
-from membase.api.rest_client import RestConnection
+from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
 from memcached.helper.data_helper import MemcachedClientHelper
 from random import randrange
@@ -61,17 +61,18 @@ class CBRbaseclass(XDCRReplicationBaseTest):
 
     def wait_for_catchup(self, servers):
         for bucket in self.buckets:
-            _items = 0
             start = time.time()
             while time.time() - start < 600:
+                _items = 0
                 for server in servers:
                     mc = MemcachedClientHelper.direct_client(server, bucket.name)
-                    _items += mc.stats()["curr_items"]
-                if _items == self._num_items:
+                    _items += int(mc.stats()["curr_items"])
+                    mc.close()
+                if _items == int(self._num_items):
                     break
                 self.sleep(self._timeout)
 
-    def cbr_routine(self, _healthy_, _compromised_):
+    def cbr_routine(self, _healthy_, _compromised_, _compromised_cluster):
         shell = RemoteMachineShellConnection(_healthy_)
         info = shell.extract_remote_info()
         _ssh_client = paramiko.SSHClient()
@@ -92,17 +93,13 @@ class CBRbaseclass(XDCRReplicationBaseTest):
                                                     bucket.name)
                 self.log.info("Running command .. {0}".format(command))
                 _ssh_client.exec_command(command)
+        self.wait_for_catchup(_compromised_cluster)
         shell.disconnect()
 
-    def trigger_rebalance(self, _nodes_, failed_nodes):
-        _remove_ = []
-        for node in _nodes_:
-            for item in failed_nodes:
-                if node.ip == item.ip:
-                    _nodes_.remove(node)
-                    _remove_.append(node)
-        rest.rebalance(otpNodes=["ns_1@{0}".format(node.ip) for node in _nodes_], ejectedNodes=["ns_1@{0}".format(item.ip) for item in _remove_])
-        rest.rebalance_reached()
+    def trigger_rebalance(self, rest):
+        _nodes_ = rest.node_statuses()
+        rest.rebalance(otpNodes=[node.id for node in _nodes_], ejectedNodes=[])
+        RestHelper(rest).rebalance_reached()
 
     def vbucket_map_checker(self, _before_, _after_, _ini_, _fin_):
         _pre_ = {}
@@ -185,10 +182,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
                 self.src_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self.dest_master, self.src_master)
-                self.wait_for_catchup(self.src_nodes)
+                self.cbr_routine(self.dest_master, self.src_master, self.src_nodes)
 
-                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
+                self.trigger_rebalance(rest)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 final_node_count = len(self.src_nodes)
 
@@ -216,10 +212,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
                 self.dest_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self.src_master, self.dest_master)
-                self.wait_for_catchup(self.dest_nodes)
+                self.cbr_routine(self.src_master, self.dest_master, self.dest_nodes)
 
-                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
+                self.trigger_rebalance(rest)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 final_node_count = len(self.dest_nodes)
 
@@ -290,10 +285,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
                 self.src_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self.dest_master, self.src_master)
-                self.wait_for_catchup(self.src_nodes)
+                self.cbr_routine(self.dest_master, self.src_master, self.src_nodes)
 
-                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
+                self.trigger_rebalance(rest)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 initial_node_count = len(self.src_nodes)
 
@@ -348,10 +342,9 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     rest.add_node(user=node.rest_username, password=node.rest_password, remoteIp=node.ip, port=node.port)
                 self.dest_nodes.extend(add_nodes)
                 # CALL THE CBRECOVERY ROUTINE
-                self.cbr_routine(self.src_master, self.dest_master)
-                self.wait_for_catchup(self.dest_nodes)
+                self.cbr_routine(self.src_master, self.dest_master, self.dest_nodes)
 
-                self.trigger_rebalance(rest.node_statuses(), failed_nodes)
+                self.trigger_rebalance(rest)
                 vbucket_map_after = rest.fetch_vbucket_map()
                 final_node_count = len(self.dest_nodes)
 
