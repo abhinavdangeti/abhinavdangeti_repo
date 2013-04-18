@@ -26,11 +26,12 @@ public class Escalated {
     private static int _final = 10000000;
     private static String _prefix = "key";
     private static long _RUNTIME_ = 172800000; //48 hours in milliseconds
+    static SerializingTranscoder _t_;
     
     static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
         List<URI> uris = new LinkedList<URI>();
         uris.add(URI.create(String.format("http://" + _serverAddrs[0] + ":" + Integer.toString(_port) + "/pools")));
-        SerializingTranscoder _t_ = new SerializingTranscoder();
+        _t_ = new SerializingTranscoder();
         _t_.setCompressionThreshold(Integer.MAX_VALUE);
         CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
         cfb.setTranscoder(_t_);
@@ -117,7 +118,7 @@ public class Escalated {
 	for (int i=0; i<_count; i++){
 		OperationFuture<Boolean> setOp;
 		String key = String.format("%s%d", _prefix, i);
-		setOp = client.set(key, _expiration_time, value.toString());
+		setOp = client.set(key, _expiration_time, value.toString(), _t_);
 		if (setOp.get().booleanValue() == false){
 			continue;
 		}
@@ -140,7 +141,7 @@ public class Escalated {
             }
 	    OperationFuture<Boolean> setOp;
 	    String key = String.format("%s%d", _prefix, i);
-   	    setOp = client.set(key, _expiration_time, value.toString());
+   	    setOp = client.set(key, _expiration_time, value.toString(), _t_);
 	    i++;
 	    if (setOp.get().booleanValue() == false){
 		continue;
@@ -195,7 +196,7 @@ public class Escalated {
 		for (int i=0; i<_final; i++) {
 		    Object getObject = null;
 		    try {
-			getObject = client.get(String.format("%s%d", _prefix, i));
+			getObject = client.get(String.format("%s%d", _prefix, i), _t_);
 		    } catch (Exception e) {
 			//Get didn't fetch
 		    }
