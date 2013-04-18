@@ -34,17 +34,14 @@ class CBRbaseclass(XDCRReplicationBaseTest):
             failover_count = self.get_failover_count(master)
             if failover_count == autofailover_count:
                 break
-            self.sleep(2)
+            self.sleep(30)
 
         if failover_count != autofailover_count:
-            rest = RestConnection(master)
-            self.log.info("Latest logs from UI:")
-            for i in rest.getlogs(): self.log.error(i)
             self.log.warn("pools/default from {0} : {1}".format(master.ip, rest.cluster_status()))
             self.fail("{0} nodes failed over, expected {1} in {2} seconds".
                             format(failover_count, autofailover_count, time.time() - time_start))
         else:
-            self.log.info("{O} nodes failed over as expected")
+            self.log.info("{0} nodes failed over as expected".format(failover_count))
 
     def get_failover_count(self, master):
         rest = RestConnection(master)
@@ -152,6 +149,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j ACCEPT")
                     shell.log_command_output(o, r)
                     shell.disconnect()
+            self.sleep(20)
         super(cbrecovery, self).tearDown()
 
     def cbrecover_multiple_failover_swapout_reb_routine(self):
@@ -245,7 +243,6 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         self.verify_results()
 
     def cbrecover_multiple_autofailover_swapout_reb_routine(self):
-        self._ifautofail = 1
         self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
         tasks = []
         if self._doc_ops is not None:
@@ -263,6 +260,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         final_node_count = 0
 
         if self._failover is not None:
+            self._ifautofail = 1
             if "source" in self._failover:
                 initial_node_count = len(self.src_nodes)
                 rest = RestConnection(self.src_master)
@@ -286,6 +284,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                         shell.stop_couchbase()
                         self.wait_for_failover_or_assert(self.src_master, _count_, self._timeout)
                         shell.disconnect()
+                        rest.reset_autofailover()
                         _count_ += 1
                 elif "firewall_block" in self.failover_reason:
                     for node in self.failed_nodes:
@@ -294,8 +293,8 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                         o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                         self.wait_for_failover_or_assert(self.src_master, _count_, self._timeout)
                         shell.disconnect()
+                        rest.reset_autofailover()
                         _count_ += 1
-#                self.wait_for_failover_or_assert(self.src_master, self._failover_count, self._timeout)
                 for node in self.failed_nodes:
                     self.src_nodes.remove(node)
                 self.sleep(self._timeout / 4)
@@ -328,18 +327,24 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                 self._autofail_enable(rest)
                 self.log.info("Triggering {0} over {1} nodes on source ..".format(self.failover_reason, self._failover_count))
                 self.failed_nodes = self.dest_nodes[(len(self.dest_nodes)-self._failover_count):len(self.dest_nodes)]
+                _count_ = 1
                 if "stop_server" in self.failover_reason:
                     for node in self.failed_nodes:
                         shell = RemoteMachineShellConnection(node)
                         shell.stop_couchbase()
+                        self.wait_for_failover_or_assert(self.dest_master, _count_, self._timeout)
                         shell.disconnect()
+                        rest.reset_autofailover()
+                        _count_ += 1
                 elif "firewall_block" in self.failover_reason:
                     for node in self.failed_nodes:
                         shell = RemoteMachineShellConnection(node)
                         shell.log_command_output(o, r)
                         o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
+                        self.wait_for_failover_or_assert(self.dest_master, _count_, self._timeout)
                         shell.disconnect()
-                self.wait_for_failover_or_assert(self.dest_master, self._failover_count, self._timeout)
+                        rest.reset_autofailover()
+                        _count_ += 1
                 for node in self.failed_nodes:
                     self.dest_nodes.remove(node)
                 self.sleep(self._timeout / 4)
