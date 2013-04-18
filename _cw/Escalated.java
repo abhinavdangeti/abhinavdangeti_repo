@@ -21,7 +21,7 @@ public class Escalated {
     private static int _port = 8091;
     private static String[] buckets = {"default", "memcached_bucket"};
     private static int _expiration_time = 3600;
-    private static int _item_size = 2048;
+    private static int _item_size = 20480;
     private static int _count = 20000;
     private static int _final = 10000000;
     private static String _prefix = "key";
