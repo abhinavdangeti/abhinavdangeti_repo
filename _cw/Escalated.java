@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.transcoders.SerializingTranscoder;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
@@ -29,7 +30,10 @@ public class Escalated {
     static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
         List<URI> uris = new LinkedList<URI>();
         uris.add(URI.create(String.format("http://" + _serverAddrs[0] + ":" + Integer.toString(_port) + "/pools")));
+        SerializingTranscoder _t_ = new SerializingTranscoder();
+        _t_.setCompressionThreshold(Integer.MAX_VALUE);
         CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
+        cfb.setTranscoder(_t_);
         try {
 	     	return new CouchbaseClient(cfb.buildCouchbaseConnection(uris, _bucketName, _bucketPwd));
         } catch (Exception e) {
