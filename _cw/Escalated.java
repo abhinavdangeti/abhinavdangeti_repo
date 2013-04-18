@@ -19,7 +19,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 public class Escalated {
     private static String[] _serverAddrs = {"10.x.x.xxx", "10.x.x.xxx", "10.x.x.xxx"};
     private static int _port = 8091;
-    private static String[] buckets = {"default", "memcached_bucket"};
+    private static String[] buckets = {"default"};//, "memcached_bucket"};
     private static int _expiration_time = 3600;
     private static int _item_size = 20480;
     private static int _count = 20000;
