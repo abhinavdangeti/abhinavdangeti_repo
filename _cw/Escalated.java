@@ -136,7 +136,7 @@ public class Escalated {
         long endTime = System.currentTimeMillis();
         int i = 0;
 	while ((endTime - startTime) < _RUNTIME_){
-            while (_curr_calc("curr_items", client) >= _count) {        // Set only if item count is less than 20000
+            while (_curr_calc("curr_items", client) >= _count) {        // Set only if item count is less than _count_ value
                 Thread.sleep(10000);
             }
 	    OperationFuture<Boolean> setOp;
