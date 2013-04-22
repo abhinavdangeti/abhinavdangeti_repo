@@ -269,7 +269,7 @@ public class Mainhelper {
 		Thread.sleep(5000);
 		client.shutdown();
 		System.out.println("\n - - - - - - - - - - ");
-		System.out.println("LATENCY STATS :- ");
+		System.out.println("LATENCY STATS (ONLY IF WITH OBSERVE) :- ");
 		System.out.println("SETS: " + set_latency + "ms.");
 		System.out.println("DELETES: " + delete_latency + "ms.");
 		System.out.println("ADDS: " + add_latency + "ms.");
