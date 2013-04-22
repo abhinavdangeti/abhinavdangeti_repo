@@ -20,14 +20,14 @@ public class Replacer {
 	 * Replaced items have key [Key-i] and corresponding json document [new-i].
 	 */
 	@SuppressWarnings("unused")
-	public static double replace_items(int number_items, int item_size, double ratio_replace, int expiration, Boolean OBSERVE, CouchbaseClient client) 
+	public static double replace_items(int number_items, int item_size, double ratio_replace, int expiration, Boolean OBSERVE, CouchbaseClient client, String PREFIX) 
 					throws URISyntaxException, IOException, JSONException {
 		double rep_items = ratio_replace * number_items;
 		double tot_time = 0.0;
 		int obs_true=0,obs_false=0;
 		Random generator = new Random( 987654321 );
 		for(int i=number_items/2 + 1;i<=((int)(number_items/2) + (int)(rep_items));i++){
-			String Key = String.format("Key-%d", i);
+			String Key = String.format("%s%d", PREFIX, i);
 			//String Value = String.format("%d", i);
 			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			try{
