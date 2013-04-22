@@ -16,7 +16,7 @@ public class Deleter {
 	 * Items are deleted based on the key.
 	 */
 	@SuppressWarnings("unused")
-	public static double delete_items(int number_items, double ratio_delete, Boolean OBSERVE, CouchbaseClient client)
+	public static double delete_items(int number_items, double ratio_delete, Boolean OBSERVE, CouchbaseClient client, String PREFIX)
 					throws URISyntaxException, IOException {
 		double del_items = ratio_delete * number_items;
 		int count = 0;
@@ -27,7 +27,7 @@ public class Deleter {
 				OperationFuture<Boolean> delOp = null;
 				if(OBSERVE){
 					long preOBS = System.nanoTime();
-					delOp = client.delete(String.format("Key-%d", i), PersistTo.MASTER);
+					delOp = client.delete(String.format("%s%d", PREFIX, i), PersistTo.MASTER);
 					if(delOp.get().booleanValue())
 						obs_true++;
 					else
@@ -36,7 +36,7 @@ public class Deleter {
 					System.out.println("DELETE-OBSERVE for item " + i + " :: TOOK: " + (double)(postOBS - preOBS) / 1000000.0 + " ms.");
 					tot_time += (double)(postOBS - preOBS) / 1000000.0;
 				}else{
-					delOp = client.delete(String.format("Key-%d", i));
+					delOp = client.delete(String.format("%s%d", PREFIX, i));
 				}
 				if (!delOp.get().booleanValue()){
 					count ++;
