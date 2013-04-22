@@ -5,6 +5,7 @@ Instructions:
 - Once bucket is created, and perhaps a view, update entries in test.properties.
 	- test.properties
 		item-count
+ 		item-prefix
 		bucket-name
 		observe (boolean: true - runs tests with observe)
 		bucket-password
