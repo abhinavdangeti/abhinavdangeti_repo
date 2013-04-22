@@ -19,6 +19,7 @@ import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 public class Mainhelper {
  
 	 private static int NUM_ITEMS = 0;
+	 private static String PREFIX = "key-"
      	 private static int ITEM_SIZE = 0;
 	 private static int EXPIRATION = 0;
 	 private static double RATIO_EXP = 0;
@@ -85,8 +86,10 @@ public class Mainhelper {
 				String key = (String) enuKeys.nextElement();
 				if(key.equals("item-count"))
 					NUM_ITEMS = Integer.parseInt(properties.getProperty(key));
-                else if(key.equals("item-size"))
-                    ITEM_SIZE = Integer.parseInt(properties.getProperty(key));
+				else if(key.equals("item-prefix"))
+					PREFIX = properties.getProperty(key)
+                		else if(key.equals("item-size"))
+                    			ITEM_SIZE = Integer.parseInt(properties.getProperty(key));
 				else if(key.equals("bucket-name"))
 					BUCKET_NAME = properties.getProperty(key);
 				else if(key.equals("bucket-password"))
@@ -136,7 +139,7 @@ public class Mainhelper {
 			public void run() {
 				System.out.println("Load a " + NUM_ITEMS + " items ..");
 				try {
-					set_latency = Loader.load_items(NUM_ITEMS, ITEM_SIZE, RATIO_EXP, EXPIRATION, OBSERVE, client);
+					set_latency = Loader.load_items(NUM_ITEMS, ITEM_SIZE, RATIO_EXP, EXPIRATION, OBSERVE, client, PREFIX);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
@@ -160,7 +163,7 @@ public class Mainhelper {
 						for(int i=1;i<=NUM_ITEMS;i++){
 							Object getObject = null;
 							try{
-								getObject = client.get(String.format("Key-%d", i));
+								getObject = client.get(String.format("%s%d", PREFIX, i));
 							}catch (Exception e){
 								break;
 							}
@@ -188,7 +191,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_delete_flag.equals("yes") || do_delete_flag.equals("1")) {
 					try {
-						delete_latency = Deleter.delete_items(NUM_ITEMS, DEL_PERCENT, OBSERVE, client);
+						delete_latency = Deleter.delete_items(NUM_ITEMS, DEL_PERCENT, OBSERVE, client, PREFIX);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -202,7 +205,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_replace_flag.equals("yes") || do_replace_flag.equals("1")){
 					try {
-						replace_latency = Replacer.replace_items(NUM_ITEMS, ITEM_SIZE, REPLACE_PERCENT, EXPIRATION, OBSERVE, client);
+						replace_latency = Replacer.replace_items(NUM_ITEMS, ITEM_SIZE, REPLACE_PERCENT, EXPIRATION, OBSERVE, client, PREFIX);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -219,7 +222,7 @@ public class Mainhelper {
 			public void run() {
 				if (do_add_flag.equals("yes") || do_add_flag.equals("1")){
 					try {
-						add_latency = Adder.add_items(NUM_ITEMS, ITEM_SIZE, ADD_PERCENT, EXPIRATION, OBSERVE, client);
+						add_latency = Adder.add_items(NUM_ITEMS, ITEM_SIZE, ADD_PERCENT, EXPIRATION, OBSERVE, client, PREFIX);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
