@@ -18,14 +18,14 @@ public class Loader {
 	 * Enabling OBSERVE, makes the loader check if every item created has persisted or not.
 	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
-	public static double load_items(int number_items, int item_size, double ratio_exp, int expiration, Boolean OBSERVE, CouchbaseClient client) 
+	public static double load_items(int number_items, int item_size, double ratio_exp, int expiration, Boolean OBSERVE, CouchbaseClient client, String PREFIX) 
 			throws URISyntaxException, IOException, InterruptedException, ExecutionException, JSONException {	
 		int items_with_exp = (int)(number_items * ratio_exp);
 		double tot_time = 0.0;
 		int obs_true=0, obs_false=0;
 		Random generator = new Random( 123456789 );
 		for(int i=1;i<=(number_items - items_with_exp);i++){
-			String Key = String.format("Key-%d", i);
+			String Key = String.format("%s%d", PREFIX, i);
 			//String Value = String.format("%d", i);
 			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			if(OBSERVE){
@@ -47,7 +47,7 @@ public class Loader {
 			}
 		}
 		for(int i=(number_items - items_with_exp + 1);i<=number_items;i++){
-			String Key = String.format("Key-%d", i);
+			String Key = String.format("%s%d", PREFIX, i);
 			//String Value = String.format("%d", i);
 			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			if(OBSERVE){
