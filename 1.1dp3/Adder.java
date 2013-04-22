@@ -20,14 +20,14 @@ public class Adder {
 	 * Inserted items have key [Key-i] and corresponding json document [i].
 	 */
 	@SuppressWarnings("unused")
-	public static double add_items(int number_items, int item_size, double ratio_add, int expiration, Boolean OBSERVE, CouchbaseClient client) 
+	public static double add_items(int number_items, int item_size, double ratio_add, int expiration, Boolean OBSERVE, CouchbaseClient client, String PREFIX) 
 					throws URISyntaxException, IOException, JSONException {
 		double add_items = ratio_add * number_items;
 		double tot_time = 0.0;
 		int obs_true=0, obs_false=0;
 		Random generator = new Random( 123456789 );
 		for(int i=number_items;i<=number_items + (int)(add_items);i++){
-			String Key = String.format("Key-%d", i);
+			String Key = String.format("%s%d", PREFIX, i);
 			//String Value = String.format("%d", i);
 			JSONObject Value = Jsongen.retrieveJSON(i, generator, item_size);
 			try{
