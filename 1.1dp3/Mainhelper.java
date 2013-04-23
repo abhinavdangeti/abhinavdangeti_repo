@@ -20,7 +20,7 @@ public class Mainhelper {
  
 	 private static int NUM_ITEMS = 0;
 	 private static String PREFIX = "key-";
-     private static int ITEM_SIZE = 0;
+         private static int ITEM_SIZE = 0;
 	 private static int EXPIRATION = 0;
 	 private static double RATIO_EXP = 0;
 	 private static Boolean OBSERVE = false;
@@ -88,8 +88,8 @@ public class Mainhelper {
 					NUM_ITEMS = Integer.parseInt(properties.getProperty(key));
 				else if(key.equals("item-prefix"))
 					PREFIX = properties.getProperty(key);
-                else if(key.equals("item-size"))
-                    ITEM_SIZE = Integer.parseInt(properties.getProperty(key));
+                                else if(key.equals("item-size"))
+                                        ITEM_SIZE = Integer.parseInt(properties.getProperty(key));
 				else if(key.equals("bucket-name"))
 					BUCKET_NAME = properties.getProperty(key);
 				else if(key.equals("bucket-password"))
