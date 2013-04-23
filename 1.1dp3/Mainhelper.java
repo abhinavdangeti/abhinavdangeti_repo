@@ -238,12 +238,12 @@ public class Mainhelper {
 		System.out.println("Running thread to set: ");
 		Thread thread1 = new Thread(myRunnable1);
 		thread1.start();
-		//System.out.println("Running thread to get: ");
-		//Thread thread2 = new Thread(myRunnable2);
-		//thread2.start();
+		System.out.println("Running thread to get: ");
+		Thread thread2 = new Thread(myRunnable2);
+		thread2.start();
 		
 		thread1.join();
-		//thread2.join();
+		thread2.join();
 		
         	Thread.sleep(5000);
 
