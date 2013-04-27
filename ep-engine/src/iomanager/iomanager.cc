@@ -42,7 +42,7 @@ size_t IOManager::scheduleVBSnapshot(EventuallyPersistentEngine *engine,
                                      const Priority &priority, int sid,
                                      int sleeptime, bool isDaemon) {
     assert(sid < writers);
-    ExTask task = new VBSnapshotTask(engine, priority, isDaemon);
+    ExTask task = new VBSnapshotTask(engine, priority, sid, isDaemon);
     return schedule(task, sid);
 }
 

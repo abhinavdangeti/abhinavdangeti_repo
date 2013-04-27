@@ -461,10 +461,6 @@ bool EventuallyPersistentStore::startBgFetcher() {
     for (uint16_t i = 0; i < vbMap.numShards; i++) {
         BgFetcher *bgfetcher = vbMap.shards[i]->getBgFetcher();
         if (bgfetcher == NULL) {
-            for (uint16_t j = 0; j < i; ++j) {
-                bgfetcher = vbMap.shards[j]->getBgFetcher();
-                bgfetcher->stop();
-            }
             LOG(EXTENSION_LOG_WARNING,
                 "Falied to start bg fetcher for shard %d", i);
             return false;
@@ -1427,7 +1423,7 @@ EventuallyPersistentStore::statsVKey(const std::string &key,
         IOManager* iom = IOManager::get();
         iom->scheduleVKeyFetch(&engine, key, vbucket, v->getId(), cookie,
                                Priority::VKeyStatBgFetcherPriority,
-                               vbMap.getShard(vbucket)->getId(), 0,
+                               vbMap.getShard(v->getId())->getId(), 0,
                                bgFetchDelay);
         bgFetchQueue++;
         assert(bgFetchQueue > 0);
@@ -2035,6 +2031,7 @@ EventuallyPersistentStore::flushOneDelOrSet(const queued_item &qi,
             v->reDirty();
             rejectQueues[vb->getId()].push(qi);
             ++vb->opsReject;
+            return NULL;
         }
     }
 

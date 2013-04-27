@@ -75,7 +75,7 @@ bool FlusherTask::run() {
 }
 
 bool VBSnapshotTask::run() {
-    engine->getEpStore()->snapshotVBuckets(priority, 0);
+    engine->getEpStore()->snapshotVBuckets(priority, shardID);
     return false;
 }
 

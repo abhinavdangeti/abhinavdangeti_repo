@@ -137,14 +137,19 @@ private:
 class VBSnapshotTask : public GlobalTask {
 public:
     VBSnapshotTask(EventuallyPersistentEngine *e, const Priority &p,
-                bool isDaemon = false, bool completeBeforeShutdown = true) :
-                GlobalTask(e, p, 0, 0, isDaemon, completeBeforeShutdown) {}
+                uint16_t sID = 0, bool isDaemon = false,
+				bool completeBeforeShutdown = true) :
+                GlobalTask(e, p, 0, 0, isDaemon, completeBeforeShutdown),
+				shardID(sID) {}
 
     bool run();
 
     std::string getDescription() {
         return "Snapshotting a VBucket";
     }
+
+private:
+	uint16_t shardID;
 };
 
 /**

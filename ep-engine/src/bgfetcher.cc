@@ -7,6 +7,7 @@
 const double BgFetcher::sleepInterval = 1.0;
 
 void BgFetcher::start() {
+    LockHolder lh(taskMutex);
     pendingFetch.cas(false, true);
     IOManager* iom = IOManager::get();
     taskId = iom->scheduleMultiBGFetcher(&(store->getEPEngine()), this,
@@ -23,8 +24,7 @@ void BgFetcher::stop() {
 }
 
 void BgFetcher::notifyBGEvent(void) {
-    ++stats.numRemainingBgJobs;
-    if (pendingFetch.cas(false, true)) {
+    if (++stats.numRemainingBgJobs == 1) {
         LockHolder lh(taskMutex);
         assert(taskId > 0);
         IOManager::get()->wake(taskId);
@@ -130,8 +130,8 @@ bool BgFetcher::run(size_t tid) {
         IOManager::get()->snooze(taskId, sleep);
 
         if (pendingFetch.get()) {
-            // check again a new fetch request could have arrived
-            // right before calling above snooze()
+            // check again numRemainingBgJobs, a new fetch request
+            // could have arrvied right before calling above snooze()
             IOManager::get()->snooze(taskId, 0);
         }
     }

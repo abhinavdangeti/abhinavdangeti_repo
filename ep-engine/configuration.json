@@ -250,7 +250,7 @@
             "type": "size_t"
         },
         "max_num_shards": {
-            "default": "2",
+            "default": "1",
             "descr": "Maximum number of logical vbucket group.",
             "dynamic": false,
             "type": "size_t",
