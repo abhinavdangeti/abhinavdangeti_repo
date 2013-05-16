@@ -1,4 +1,4 @@
-Sets / Gets / Appends
+Sets / Gets 
 
 Edit test.properties for run-spec and cluster details
 
