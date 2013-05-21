@@ -56,6 +56,7 @@ public class Helper {
 	Setrunner.sets(sh, source_client, destination_client);
 
 	// Operation that delrm's on source, and delwithMeta's on destination with the meta from delrm
+        Delrunner.dels(sh, source_client, destination_client);
 
 	// Operation that addrm's on source, and addwithMeta's on destination with the meta from addrm
 	Addrunner.adds(sh, source_client, destination_client);
