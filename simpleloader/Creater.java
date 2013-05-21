@@ -33,8 +33,8 @@ public class Creater {
 		    setOp = client.set(key, 0, _val.toString());
 		} else {
 		    setOp = client.set(key, 0, value.toString());
-		    creates.add(setOp);
 		}
+		creates.add(setOp);
 	    }
 	    while (!creates.isEmpty()) {
 		if (creates.get(0).get().booleanValue() == false){
