@@ -27,7 +27,7 @@ public class Escalated {
     private static String _prefix = "key";
     private static long _RUNTIME_ = 172800000; //48 hours in milliseconds
     static SerializingTranscoder _t_;
-    
+
     static final CouchbaseClient connect(String _bucketName, String _bucketPwd) throws URISyntaxException, IOException{
         List<URI> uris = new LinkedList<URI>();
         uris.add(URI.create(String.format("http://" + _serverAddrs[0] + ":" + Integer.toString(_port) + "/pools")));
@@ -42,130 +42,122 @@ public class Escalated {
                                + e.getMessage());
 	      	System.exit(0);
         }
-        return null;	    
+        return null;
     }
-    
+
     public static void main(String args[]) throws URISyntaxException, IOException, InterruptedException, ExecutionException{
-        
+
         for (String s : buckets) {
             CouchbaseClient client = connect(s, "");
             load_initial(client);
             client.shutdown();
         }
-        
+
         System.out.println("Completed stage 1: initial load on all buckets ..");
-        
+
         final CouchbaseClient dclient = connect(buckets[0], "");
         //final CouchbaseClient mclient = connect(buckets[1], "");
-        
+
         Runnable _memop_ = new Runnable() {
             public void run() {
                 try {
-			getter(dclient);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}   
+			        getter(dclient);
+		        } catch (InterruptedException e) {
+			        e.printStackTrace();
+		        } catch (ExecutionException e) {
+			        e.printStackTrace();
+		        } catch (URISyntaxException e) {
+			        e.printStackTrace();
+		        } catch (IOException e) {
+			        e.printStackTrace();
+		        }
             }
         };
-        
+
         Runnable _defop_ = new Runnable() {
             public void run() {
                 try {
-			load_post(dclient);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			        load_post(dclient);
+		        } catch (UnknownHostException e) {
+			        e.printStackTrace();
+		        } catch (InterruptedException e) {
+			        e.printStackTrace();
+		        } catch (ExecutionException e) {
+			        e.printStackTrace();
+		        }
             }
         };
-        
+
         Thread _for_default_ = new Thread(_defop_);
         _for_default_.start();					//Running ops on default
-        
+
         Thread _for_memcachedbucket_ = new Thread(_memop_);
         _for_memcachedbucket_.start();			//Running gets on default
-        
+
         _for_default_.join();
         _for_memcachedbucket_.interrupt();
         dclient.shutdown();
         //mclient.shutdown();
         System.exit(0);
-        
+
     }
-    
+
     private static void load_initial(CouchbaseClient client) throws InterruptedException, ExecutionException {
-	StringBuffer value = new StringBuffer();
-	String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	    StringBuffer value = new StringBuffer();
+	    String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
             value.append(CHAR_LIST);
         }
-	for (int i=0; i<_count; i++){
-		OperationFuture<Boolean> setOp;
-		String key = String.format("%s%d", _prefix, i);
-		setOp = client.set(key, _expiration_time, value.toString(), _t_);
-		if (setOp.get().booleanValue() == false){
-			continue;
-		}
-	}		
+	    for (int i=0; i<_count; i++){
+		    OperationFuture<Boolean> setOp;
+		    String key = String.format("%s%d", _prefix, i);
+		    setOp = client.set(key, _expiration_time, value.toString(), _t_);
+		    if (setOp.get().booleanValue() == false){
+			    continue;
+		    }
+	    }		
     }
-    
+
     private static void load_post(CouchbaseClient client) throws InterruptedException, ExecutionException, UnknownHostException {
-	StringBuffer value = new StringBuffer();
-	String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	    StringBuffer value = new StringBuffer();
+	    String CHAR_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         while (value.length() < _item_size) {
             value.append(CHAR_LIST);
         }
-	//for (int i=_count; i<_final; i++){
+	    //for (int i=_count; i<_final; i++){
         long startTime = System.currentTimeMillis();
         long endTime = System.currentTimeMillis();
         int i = 0;
-	while ((endTime - startTime) < _RUNTIME_){
+	    while ((endTime - startTime) < _RUNTIME_){
             while (_curr_calc("curr_items", client) >= _count) {        // Set only if item count is less than _count_ value
                 Thread.sleep(10000);
             }
-	    OperationFuture<Boolean> setOp;
-	    String key = String.format("%s%d", _prefix, i);
-   	    setOp = client.set(key, _expiration_time, value.toString(), _t_);
-	    i++;
-	    if (setOp.get().booleanValue() == false){
-		continue;
+	        OperationFuture<Boolean> setOp;
+	        String key = String.format("%s%d", _prefix, i);
+   	        setOp = client.set(key, _expiration_time, value.toString(), _t_);
+	        i++;
+	        if (setOp.get().booleanValue() == false){
+		        continue;
+	        }
+	        endTime = System.currentTimeMillis();
 	    }
-	    endTime = System.currentTimeMillis();
-	}
-		
     }
-    
+
     private static int _curr_calc(String parameter, CouchbaseClient client) throws UnknownHostException {
     	int _ep_curr_items = 0;
-	Map<SocketAddress, Map<String, String>> map = client.getStats();
-	Iterator<SocketAddress> iterator = map.keySet().iterator();
-        
-	Map<String, Integer> hm = new HashMap<String, Integer>();
-	while (iterator.hasNext()){
+	    Map<SocketAddress, Map<String, String>> map = client.getStats();
+	    Iterator<SocketAddress> iterator = map.keySet().iterator();
+
+	    Map<String, Integer> hm = new HashMap<String, Integer>();
+	    while (iterator.hasNext()){
             Object key = iterator.next();
 			
-	    if (hm.containsKey(key.toString())) {
+	        if (hm.containsKey(key.toString())) {
                 System.out.println("yes");
                 if (hm.size() == _serverAddrs.length)
                     break;
                 continue;
-	    }
+	        }
             Map<String, String> map1 = map.get(key);
             Iterator<String> tt = map1.keySet().iterator();
             //System.out.println(key.toString());
@@ -180,28 +172,28 @@ public class Escalated {
                     hm.put(key.toString(), Integer.parseInt(val2.toString()));
                 }
             }
-	}
+	    }
 		
-	Iterator<String> it = hm.keySet().iterator();
-        while (it.hasNext()) {
-            _ep_curr_items += hm.get(it.next().toString());
-        }
-	return _ep_curr_items;
+	    Iterator<String> it = hm.keySet().iterator();
+            while (it.hasNext()) {
+                _ep_curr_items += hm.get(it.next().toString());
+            }
+	    return _ep_curr_items;
     }
-    
+
     @SuppressWarnings("unused")
 	private static void getter(CouchbaseClient client) throws InterruptedException, ExecutionException, URISyntaxException, IOException {
 	    while (true) {
-		Thread.sleep(5000);
-		for (int i=0; i<_final; i++) {
-		    Object getObject = null;
-		    try {
-			getObject = client.get(String.format("%s%d", _prefix, i), _t_);
-		    } catch (Exception e) {
-			//Get didn't fetch
+		    Thread.sleep(5000);
+		    for (int i=0; i<_final; i++) {
+		        Object getObject = null;
+		        try {
+			        getObject = client.get(String.format("%s%d", _prefix, i), _t_);
+		        } catch (Exception e) {
+			        //Get didn't fetch
+		        }
 		    }
-		}
 	    }
 	}
-    
+
 }
