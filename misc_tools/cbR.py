@@ -27,9 +27,8 @@ class CBRbaseclass(XDCRReplicationBaseTest):
         self.assertEquals(settings.enabled, False)
 
     def wait_for_failover_or_assert(self, master, autofailover_count, timeout):
-        rest = RestConnection(master)
         time_start = time.time()
-        time_max_end = time_start + timeout + 60
+        time_max_end = time_start + 300
         failover_count = 0
         while time.time() < time_max_end:
             failover_count = self.get_failover_count(master)
@@ -38,6 +37,7 @@ class CBRbaseclass(XDCRReplicationBaseTest):
             self.sleep(30)
 
         if failover_count != autofailover_count:
+            rest = RestConnection(master)
             self.log.warn("pools/default from {0} : {1}".format(master.ip, rest.cluster_status()))
             self.fail("{0} node(s) failed over, expected {1} in {2} seconds".
                             format(failover_count, autofailover_count, time.time() - time_start))
@@ -120,18 +120,20 @@ class CBRbaseclass(XDCRReplicationBaseTest):
         rest = RestConnection(master)
         if "stop_server" in self.failover_reason:
             for node in self.failed_nodes:
-                shell = RemoteMachineShellConnection(node)
-                shell.stop_couchbase()
                 """
                 Autofailover will not auto failover nodes, if it could
                 result in data loss, so force failover
                 """
-                if _count_ > 1:
+                if _count_ > self._num_replicas:
                     time.sleep(10)
                     for item in rest.node_statuses():
                         if node.ip == item.ip:
                             rest.fail_over(item.id)
                             break
+                    _count_ += 1
+                    continue
+                shell = RemoteMachineShellConnection(node)
+                shell.stop_couchbase()
                 self.wait_for_failover_or_assert(master, _count_, self._timeout)
                 shell.disconnect()
                 rest.reset_autofailover()
@@ -139,18 +141,20 @@ class CBRbaseclass(XDCRReplicationBaseTest):
 
         elif "firewall_block" in self.failover_reason:
             for node in self.failed_nodes:
-                shell = RemoteMachineShellConnection(node)
-                o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                 """
                 Autofailover will not auto failover nodes, if it could
                 result in data loss, so force failover
                 """
-                if _count_ > 1:
+                if _count_ > self._num_replicas:
                     time.sleep(10)
                     for item in rest.node_statuses():
                         if node.ip == item.ip:
                             rest.fail_over(item.id)
                             break
+                    _count_ += 1
+                    continue
+                shell = RemoteMachineShellConnection(node)
+                o, r = shell.execute_command("/sbin/iptables -A INPUT -p tcp -i eth0 --dport 1000:60000 -j REJECT")
                 self.wait_for_failover_or_assert(master, _count_, self._timeout)
                 shell.disconnect()
                 rest.reset_autofailover()
@@ -201,8 +205,16 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         self._failover_count = self._input.param("fail_count", 0)
         self._add_count = self._input.param("add_count", 0)
         self.failover_reason = self._input.param("failover_reason", "stop_server")     # or firewall_block
+        self.flag_val = self._input.param("setflag", 0)
         self.failed_nodes = []
         self._ifautofail = 0
+        for server in self._servers:
+            rest = RestConnection(server)
+            rest.reset_autofailover()
+            shell = RemoteMachineShellConnection(server)
+            o, r = shell.execute_command("iptables -F")
+            shell.log_command_output(o, r)
+            shell.disconnect()
 
     def tearDown(self):
         if self._ifautofail == 1:
@@ -223,7 +235,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         super(cbrecovery, self).tearDown()
 
     def cbrecover_multiple_failover_swapout_reb_routine(self):
-        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0, flag=self.flag_val)
         tasks = []
         if self._doc_ops is not None:
             if "update" in self._doc_ops:
@@ -258,7 +270,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     return
                 self.log.info("Failing over {0} nodes on source ..".format(self._failover_count))
                 self.failed_nodes = self.src_nodes[(len(self.src_nodes)-self._failover_count):len(self.src_nodes)]
-                self._cluster_helper.failover(self.src_nodes, self.failed_nodes)
+                self.cluster.failover(self.src_nodes, self.failed_nodes)
                 for node in self.failed_nodes:
                     self.src_nodes.remove(node)
                 add_nodes = self._floating_servers_set[0:self._add_count]
@@ -289,7 +301,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     return
                 self.log.info("Failing over {0} nodes on destination ..".format(self._failover_count))
                 self.failed_nodes = self.dest_nodes[(len(self.dest_nodes)-self._failover_count):len(self.dest_nodes)]
-                self._cluster_helper.failover(self.dest_nodes, self.failed_nodes)
+                self.cluster.failover(self.dest_nodes, self.failed_nodes)
                 for node in self.failed_nodes:
                     self.dest_nodes.remove(node)
                 add_nodes = self._floating_servers_set[0:self._add_count]
@@ -319,7 +331,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         self.verify_results(verify_src=True)
 
     def cbrecover_multiple_autofailover_swapout_reb_routine(self):
-        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0, flag=self.flag_val)
         tasks = []
         if self._doc_ops is not None:
             if "update" in self._doc_ops:
@@ -424,7 +436,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
         self.verify_results(verify_src=True)
 
     def cbrecover_multiple_failover_addback_routine(self):
-        self._load_all_buckets(self.src_master, self.gen_create, "create", 0)
+        self._load_all_buckets(self.src_master, self.gen_create, "create", 0, flag=self.flag_val)
         tasks = []
         if self._doc_ops is not None:
             if "update" in self._doc_ops:
@@ -459,7 +471,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     return
                 self.log.info("Failing over {0} nodes on source ..".format(self._failover_count))
                 self.failed_nodes = self.src_nodes[(len(self.src_nodes)-self._failover_count):len(self.src_nodes)]
-                self._cluster_helper.failover(self.src_nodes, self.failed_nodes)
+                self.cluster.failover(self.src_nodes, self.failed_nodes)
                 self.sleep(self._timeout / 4)
                 self.log.info("Adding back the {0} nodes that were failed over ..".format(self._failover_count))
                 for node in self.failed_nodes:
@@ -492,7 +504,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     return
                 self.log.info("Failing over {0} nodes on destination ..".format(self._failover_count))
                 self.failed_nodes = self.dest_nodes[(len(self.dest_nodes)-self._failover_count):len(self.dest_nodes)]
-                self._cluster_helper.failover(self.dest_nodes, self.failed_nodes)
+                self.cluster.failover(self.dest_nodes, self.failed_nodes)
                 self.sleep(self._timeout / 4)
                 self.log.info("Adding back the {0} nodes that were failed over ..".format(self._failover_count))
                 for node in self.failed_nodes:
