@@ -45,8 +45,8 @@ public class Main {
             int sample = randgen.nextInt(1000)%30 + 3;
             System.out.println(" Sleep for " + sample + "s.");
             Thread.sleep(sample * 1000);
-            long preOBS = System.nanoTime();
             JSONObject value = new JSONObject("{\"value\":\"" + i + "\"}");
+            long preOBS = System.nanoTime();
             OperationFuture<Boolean> setOp = client.set(key + i, value.toString(), ReplicateTo.ONE);
             long postOBS = System.nanoTime();
             if (setOp.get().booleanValue() == false){
