@@ -11,7 +11,8 @@ import net.spy.memcached.internal.OperationFuture;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
-
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 public class Main {
     private static String _serverAddr = "10.5.2.54";
@@ -33,15 +34,20 @@ public class Main {
         return null;
     }
 
-    public static void main(String args[]) throws URISyntaxException, IOException, InterruptedException, ExecutionException {
+    public static void main(String args[])
+        throws URISyntaxException, IOException, InterruptedException, ExecutionException, JSONException {
         CouchbaseClient client = connect();
         String key = "test_key";
-        String value = "test_value";
         double sum = 0;
         Random randgen = new Random();
+        System.out.println("- + - + - + - + - + - + - + - + - + - + -");
         for (int i=0; i<num_samples; i++) {
+            int sample = randgen.nextInt(1000)%30 + 3;
+            System.out.println(" Sleep for " + sample + "s.");
+            Thread.sleep(sample * 1000);
             long preOBS = System.nanoTime();
-            OperationFuture<Boolean> setOp = client.set(key + i, value + i, ReplicateTo.ONE);
+            JSONObject value = new JSONObject("{\"value\":\"" + i + "\"}");
+            OperationFuture<Boolean> setOp = client.set(key + i, value.toString(), ReplicateTo.ONE);
             long postOBS = System.nanoTime();
             if (setOp.get().booleanValue() == false){
                 System.err.println("Set failed: " + setOp.getStatus().getMessage());
@@ -50,11 +56,9 @@ public class Main {
             double tot_time = (double)(postOBS - preOBS) / 1000000.0;
             System.out.println("Time for Observe To Replica: " + tot_time + " ms.");
             sum += tot_time;
-            int sample = randgen.nextInt(1000)%15 + 3;
-            System.out.println(" Sleep for " + sample + "s.");
-            Thread.sleep(sample * 1000);
-        }
+       }
         System.out.println("Mean time:\n " + sum/num_samples + " ms.");
+        System.out.println("- + - + - + - + - + - + - + - + - + - + -");
         client.shutdown();
         System.exit(0);
     }
