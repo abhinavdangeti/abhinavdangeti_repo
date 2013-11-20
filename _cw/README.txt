@@ -12,3 +12,9 @@ make mix
 
 To run:
 make runmix
+
+To clean:
+make clean
+
+Running escalated:
+make esc, make runesc
