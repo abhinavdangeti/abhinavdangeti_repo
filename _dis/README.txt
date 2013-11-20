@@ -22,3 +22,6 @@ make Loadrunner
 
 To run:
 make RunLoadrunner
+
+To clean:
+make clean
