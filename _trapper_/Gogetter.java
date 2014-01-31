@@ -12,10 +12,10 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 
 public class Gogetter {
-    private static String _serverAddr = "10.3.2.55";
+    private static String _serverAddr = "10.5.2.34";
     private static int _port = 8091;
     private static String[] buckets = {"default"};
-    private static int _initial_load = 100000000;
+    private static int _initial_load = 1;
     private static int _x_ = 100000;
     private static String _prefix = "key";
     private static int _item_size = 64;
@@ -66,18 +66,18 @@ public class Gogetter {
         load_star.start();
 
         //background load on default
-        Thread bg_getter = new Thread(_bg_);
-        bg_getter.start();
+        //Thread bg_getter = new Thread(_bg_);
+        //bg_getter.start();
 
         load_star.join();
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("\n Press ENTER to terminate .. \n");
-        sc = new Scanner(System.in);
-        @SuppressWarnings("unused")
-            String _ok_ = sc.nextLine();
+        //Scanner sc = new Scanner(System.in);
+        //System.out.println("\n Press ENTER to terminate .. \n");
+        //sc = new Scanner(System.in);
+        //@SuppressWarnings("unused")
+        //    String _ok_ = sc.nextLine();
 
-        bg_getter.interrupt();
+        //bg_getter.interrupt();
         dclient.shutdown();
         System.exit(0);
     }
