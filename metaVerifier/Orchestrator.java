@@ -34,7 +34,7 @@ public class Orchestrator {
 
         for (Map.Entry<String, String> htEntries : n1.entrySet()) {
             if(!(n2.containsKey(htEntries.getKey()) && n2.get(htEntries.getKey()).equals(htEntries.getValue()))){
-                System.out.println("\tKey: " + htEntries.getKey() + " Value: " + htEntries.getValue() + "mismatch in n1, n2\n");
+                System.out.println("\tKey: " + htEntries.getKey() + " Value: " + htEntries.getValue() + " :: mismatch in n1, n2\n");
             }
         }
 
