@@ -44,6 +44,7 @@ public class Main {
         String key = "test_key";
         //Random randgen = new Random();
         ArrayList<Double> arr = new ArrayList<Double>();
+        System.out.println("   -- OBSERVE TO REPLICA: LATENCIES --");
         System.out.println("- + - + - + - + - + - + - + - + - + - + -");
         for (int i=0; i<num_samples; i++) {
             //int sample = randgen.nextInt(1000)%30 + 3;
