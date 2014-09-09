@@ -17,6 +17,9 @@ struct _CTX_ {
     std::bitset<1000000> bitArray;
 };
 
+/*
+ * THE FOLLOWING NON-CRYPTOGRAPHIC HASH FUNCTION is from WikiPedia
+ */
 uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) {
     static const uint32_t c1 = 0xcc9e2d51;
     static const uint32_t c2 = 0x1b873593;
