@@ -18,7 +18,8 @@ struct _CTX_ {
 };
 
 /*
- * THE FOLLOWING NON-CRYPTOGRAPHIC HASH FUNCTION is from WikiPedia
+ * The following non-cryptographic hash function is the MURMUR hash
+ * function, obtained the following algorithm from wikipedia.
  */
 uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) {
     static const uint32_t c1 = 0xcc9e2d51;
