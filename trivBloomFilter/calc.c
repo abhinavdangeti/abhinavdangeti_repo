@@ -8,11 +8,11 @@ int main() {
 
     m = -(((n) * log(p)) / (pow(log(2), 2)));
 
-    printf("Size of bit array: %lf, approx: %lf\n", m, ceil(m));
+    printf("Size of bit array: %lf, approx: %.2lf\n", m, ceil(m));
 
     k = (m / n) * (log (2));
 
-    printf("Number of hash functions: %lf, approx: %lf\n", k, ceil(k));
+    printf("Number of hash functions: %lf, approx: %.2lf\n", k, ceil(k));
 
     return 0;
 }
