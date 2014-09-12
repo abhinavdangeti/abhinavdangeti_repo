@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 //import java.util.Random;
 
-
 import net.spy.memcached.ReplicateTo;
+import net.spy.memcached.PersistTo;
+
 import net.spy.memcached.internal.OperationFuture;
 
 import com.couchbase.client.CouchbaseClient;
@@ -23,6 +24,8 @@ public class Main {
     private static String bucket = "default";
     private static int num_samples = 100;
     private static boolean doPrintEntries = true;
+    private static boolean replicaCheck = true;             //true: ReplicateTo ONE
+                                                            //false: PersistTo MASTER
 
     static final CouchbaseClient connect() throws URISyntaxException, IOException{
         List<URI> uris = new LinkedList<URI>();
@@ -44,25 +47,47 @@ public class Main {
         String key = "test_key";
         //Random randgen = new Random();
         ArrayList<Double> arr = new ArrayList<Double>();
-        System.out.println("   -- OBSERVE TO REPLICA: LATENCIES --");
+        if (replicaCheck) {
+            System.out.println("   -- OBSERVE TO REPLICA: LATENCIES --");
+        } else {
+            System.out.println("    -- OBSERVE TO MASTER: LATENCIES --");
+        }
         System.out.println("- + - + - + - + - + - + - + - + - + - + -");
         for (int i=0; i<num_samples; i++) {
             //int sample = randgen.nextInt(1000)%30 + 3;
             //System.out.println(" Sleep for " + sample + "s.");
             //Thread.sleep(sample * 1000);
+
             JSONObject value = new JSONObject("{\"value\":\"" + i + "\"}");
-            long preOBS = System.nanoTime();
-            OperationFuture<Boolean> setOp = client.set(key + i, value.toString(), ReplicateTo.ONE);
-            long postOBS = System.nanoTime();
+            long preOBS, postOBS;
+            OperationFuture<Boolean> setOp;
+            double tot_time;
+
+            if (replicaCheck) {
+                preOBS = System.nanoTime();
+                setOp = client.set(key + i, value.toString(), ReplicateTo.ONE);
+                postOBS = System.nanoTime();
+            } else {
+                preOBS = System.nanoTime();
+                setOp = client.set(key + i, value.toString(), PersistTo.MASTER);
+                postOBS = System.nanoTime();
+            }
+
             if (setOp.get().booleanValue() == false){
                 System.err.println("Set failed: " + setOp.getStatus().getMessage());
                 //System.exit(1);
             } else {
-                double tot_time = (double)(postOBS - preOBS) / 1000000.0;
+                tot_time = (double)(postOBS - preOBS) / 1000000.0;
                 arr.add(tot_time);
+
+                //if (replicaCheck) {
+                //    System.out.println("Time for Observe To Replica: " + tot_time + " ms.");
+                //} else {
+                //    System.out.println("Time for Observe To Persist: " + tot_time + " ms. ");
+                //}
             }
-            //System.out.println("Time for Observe To Replica: " + tot_time + " ms.");
         }
+
         if (arr.size() > 0) {
             double sum = 0;
             Object[] elements = arr.toArray();
