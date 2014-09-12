@@ -6,7 +6,8 @@
 int main(int argc, char *argv[]) {
 
     if (argc != 3) {
-        printf("Usage: make calculate <key_count> <false_postive_probability>\n");
+        printf("ERROR: Incorrect number of arguments\n");
+        printf("Usage: make calculate TESTARGS=\"<key_count> <false_postive_probability>\"\n");
         return 0;
     }
 
@@ -17,8 +18,8 @@ int main(int argc, char *argv[]) {
     double m, k;
 
     if (!(ss1 >> n) || !(ss2 >> p)) {
-        printf("Error: Invalid numbers\n");
-        printf("Usage: make calculate <key_count> <false_postive_probability>\n");
+        printf("ERROR: Invalid numbers\n");
+        printf("Usage: make calculate TESTARGS=\"<key_count> <false_postive_probability>\"\n");
         return 0;
     }
 

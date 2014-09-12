@@ -105,22 +105,24 @@ void isKeyPresent(const char *key, uint32_t keylen, void* ctx) {
 int main(int argc, char *argv[]) {
 
     if (argc != 3) {
-        printf("Usage: make estimate <bit_array_size> <hashes_count>\n");
+        printf("ERROR: Incorrect number of arguments\n");
+        printf("Usage: make estimate TESTARGS=\"<bit_array_size> <hashes_count>\"\n");
         return 0;
     }
 
     std::stringstream ss1(argv[1]);
     std::stringstream ss2(argv[2]);
     int m, k;
+
     if (!(ss1 >> m) || !(ss2 >> k)) {
-        printf("Error: Invalid numbers\n");
-        printf("Usage: make estimate <bit_array_size> <hashes_count>\n");
+        printf("ERROR: Invalid numbers\n");
+        printf("Usage: make estimate TESTARGS=\"<bit_array_size> <hashes_count>\"\n");
         return 0;
     }
 
     if (m < k) {
-        printf("Error: No. of hashes cannot be greater than bit_array_size\n");
-        printf("Usage: make estimate <bit_array_size> <hashes_count>\n");
+        printf("ERROR: No. of hashes cannot be greater than bit_array_size\n");
+        printf("Usage: make estimate TESTARGS=\"<bit_array_size> <hashes_count>\"\n");
         return 0;
     }
 

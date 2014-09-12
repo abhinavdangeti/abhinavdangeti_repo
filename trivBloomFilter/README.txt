@@ -1,6 +1,6 @@
 A Bloom Filter
 
-1. Compile & Run calc.cc as:
+1. Compile & Run theCalc.cc as:
     make calculate TESTARGS="<key_count> <false_postive_probability>"
 
     This would output bitArray_size and hashes_count, which are needed to compile and run theFilter.
