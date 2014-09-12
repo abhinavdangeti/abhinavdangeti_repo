@@ -1,11 +1,9 @@
 A Bloom Filter
 
-1. Edit calc.c and set the following:
-    - estimated_key_count (n)
-    - allowed_probability_for_false_positives (p)
-
-2. Compile & Run calc.c as:
+1. Compile & Run calc.cc as:
     make calculate TESTARGS="<key_count> <false_postive_probability>"
 
-3. Compile & Run theFilter.cc as:
+    This would output bitArray_size and hashes_count, which are needed to compile and run theFilter.
+
+2. Compile & Run theFilter.cc as:
     make estimate TESTARGS="<bitArray_size> <hashes_count>"
