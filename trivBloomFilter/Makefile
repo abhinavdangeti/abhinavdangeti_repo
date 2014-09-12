@@ -1,5 +1,5 @@
 calculate:
-	g++ calc.cc -o calc && ./calc ${TESTARGS} && rm -f calc
+	g++ calc.cc -o calc && ./calc $(TESTARGS) && rm -f calc
 
 estimate:
 	g++ theFilter.cc -o theFilter && ./theFilter $(TESTARGS) && rm -f theFilter
