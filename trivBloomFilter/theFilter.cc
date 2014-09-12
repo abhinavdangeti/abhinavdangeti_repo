@@ -105,24 +105,26 @@ void isKeyPresent(const char *key, uint32_t keylen, void* ctx) {
 int main(int argc, char *argv[]) {
 
     if (argc != 3) {
-        printf("Usage: make estimate <key_count> <seed>\n");
-        return 1;
+        printf("Usage: make estimate <bit_array_size> <hashes_count>\n");
+        return 0;
     }
 
     std::stringstream ss1(argv[1]);
     std::stringstream ss2(argv[2]);
-    int key_count, seed;
-    if (!(ss1 >> key_count) || !(ss2 >> seed)) {
-        printf("Invalid number arguments\n");
-        return 1;
+    int m, k;
+    if (!(ss1 >> m) || !(ss2 >> k)) {
+        printf("Error: Invalid numbers\n");
+        printf("Usage: make estimate <bit_array_size> <hashes_count>\n");
+        return 0;
     }
 
-    if (key_count < seed) {
-        printf("Invalid arguments: make estimate <key_count> <seed>\n");
-        return 1;
+    if (m < k) {
+        printf("Error: No. of hashes cannot be greater than bit_array_size\n");
+        printf("Usage: make estimate <bit_array_size> <hashes_count>\n");
+        return 0;
     }
 
-    _CTX_ ctx(key_count, seed);
+    _CTX_ ctx(m, k);
 
     int i;
 

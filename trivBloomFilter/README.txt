@@ -5,7 +5,7 @@ A Bloom Filter
     - allowed_probability_for_false_positives (p)
 
 2. Compile & Run calc.c as:
-    make calculate
+    make calculate TESTARGS="<key_count> <false_postive_probability>"
 
 3. Compile & Run theFilter.cc as:
-    make estimate TESTARGS="<key_count> <seed>"
+    make estimate TESTARGS="<bitArray_size> <hashes_count>"

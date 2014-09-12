@@ -1,8 +1,8 @@
 calculate:
-	gcc calc.c -o temp && ./temp && rm -f temp
+	g++ calc.cc -o calc && ./calc ${TESTARGS} && rm -f calc
 
 estimate:
-	g++ theFilter.cc -o temp && ./temp $(TESTARGS) && rm -f temp
+	g++ theFilter.cc -o theFilter && ./theFilter $(TESTARGS) && rm -f theFilter
 
 clean:
-	rm -f temp
+	rm -f calc theFilter
