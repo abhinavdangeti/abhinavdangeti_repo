@@ -8,6 +8,8 @@
 #include <string>
 #include <sstream>
 
+#include "MurmurHash3.h"
+
 struct _CTX_ {
     _CTX_(int size, int count):
         el_size(size), seed(count) {}
@@ -20,7 +22,7 @@ struct _CTX_ {
 /*
  * The following non-cryptographic hash function is the MURMUR hash
  * function, obtained the following algorithm from wikipedia.
- */
+ *
 uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) {
     static const uint32_t c1 = 0xcc9e2d51;
     static const uint32_t c2 = 0x1b873593;
@@ -70,21 +72,34 @@ uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) {
 
     return hash;
 }
+ */
 
 void add(const char *key, uint32_t keylen, void* ctx) {
-    uint32_t i, result;
+    uint32_t i;
+    uint64_t result;
     _CTX_ *cb = static_cast<_CTX_ *>(ctx);
     for (i = 0; i < cb->seed; i++) {
-        result = murmur3_32(key, keylen, i);
+        //result = murmur3_32(key, keylen, i);
+        if (sizeof(void*) == 8) { // 64 bit
+            MurmurHash3_x64_128(key, keylen, i, &result);
+        } else { // 32 bit
+            MurmurHash3_x86_128(key, keylen, i, &result);
+        }
         cb->bitArray[result % cb->el_size] = 1;
     }
 }
 
 int lookup(const char *key, uint32_t keylen, void* ctx) {
-    uint32_t i, result;
+    uint32_t i;
+    uint64_t result;
     _CTX_ *cb = static_cast<_CTX_ *>(ctx);
     for (i = 0; i < cb->seed; i++) {
-        result = murmur3_32(key, keylen, i);
+        //result = murmur3_32(key, keylen, i);
+        if (sizeof(void*) == 8) { // 64 bit
+            MurmurHash3_x64_128(key, keylen, i, &result);
+        } else { // 32 bit
+            MurmurHash3_x86_128(key, keylen, i, &result);
+        }
         if (cb->bitArray[result % cb->el_size] == 0) {
             // The key does not exist
             return 0;

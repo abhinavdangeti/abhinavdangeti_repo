@@ -2,7 +2,7 @@ calculate:
 	g++ theCalc.cc -o theCalc && ./theCalc $(TESTARGS) && rm -f theCalc
 
 estimate:
-	g++ theFilter.cc -o theFilter && ./theFilter $(TESTARGS) && rm -f theFilter
+	g++ -o theFilter theFilter.cc MurmurHash3.cc && ./theFilter $(TESTARGS) && rm -f theFilter
 
 clean:
-	rm -f theCalc theFilter
+	rm -f theCalc MurmurHash3 theFilter
